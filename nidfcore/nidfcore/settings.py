@@ -21,6 +21,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Local apps
+    'accounts.apps.AccountsConfig',
+    'apis.apps.ApisConfig',
+
     # Third party apps
     'rest_framework',
     'knox',
