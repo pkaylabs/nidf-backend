@@ -6,4 +6,4 @@ app_name = 'apis'
 
 urlpatterns = [
     path('', views.PingAPI.as_view(), name='ping'),
-]
+]   
