@@ -4,4 +4,6 @@ from . import views
 
 app_name = 'apis'
 
-urlpatterns = []
+urlpatterns = [
+    path('', views.PingAPI.as_view(), name='ping'),
+]
