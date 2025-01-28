@@ -6,8 +6,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import User
-from apis.serializers import LoginSerializer, RegisterUserSerializer, UserSerializer
+from apis.serializers import (LoginSerializer, RegisterUserSerializer,
+                              UserSerializer)
 from nidfcore.utils.constants import UserType
+
 
 class LoginAPI(APIView):
     '''Login api endpoint'''

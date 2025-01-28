@@ -1,8 +1,9 @@
-from django.db import models
 import random
 import string
 
-from accounts.models import User, Church
+from django.db import models
+
+from accounts.models import Church, User
 from nidfcore.utils.constants import ApplicationStatus, ConstLists, SupportType
 
 

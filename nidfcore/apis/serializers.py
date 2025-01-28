@@ -4,6 +4,7 @@ from rest_framework import serializers
 from accounts.models import Church, User
 from apis.models import Application
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

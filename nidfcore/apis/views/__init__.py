@@ -1,8 +1,9 @@
 from .applications import *
 from .disbursements import *
 from .repayments import *
-from .users import *
 from .subdivisions import *
+from .users import *
+
 
 class PingAPI(APIView):
     '''An endpoint to test if the API is up and running'''
