@@ -54,9 +54,17 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         return user
 
 
+class AddApplicationSerializers(serializers.ModelSerializer):
+    '''Serializer for adding applications'''
+    class Meta:
+        model = Application
+        fields = "__all__"
+
+        
 class ApplicationSerializers(serializers.ModelSerializer):
     '''Serializer for applications'''
     church = serializers.PrimaryKeyRelatedField(queryset=Church.objects.all())
     class Meta:
         model = Application
         fields = "__all__"
+        

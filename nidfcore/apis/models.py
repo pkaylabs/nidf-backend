@@ -31,15 +31,16 @@ class Application(models.Model):
     amount_in_words = models.CharField(max_length=500, default='')
     estimated_project_cost = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     project_location = models.CharField(max_length=500)
-    purpose = models.TextField()
-    phase = models.CharField(max_length=100)
-    description = models.TextField() 
+    purpose = models.TextField(null=True, blank=True)
+    phase = models.CharField(max_length=100, default='')
+    description = models.TextField(null=True, blank=True) 
     status = models.CharField(max_length=20, default=ApplicationStatus.DRAFT.value)
     
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='updated_by')
 
     def __str__(self):
         return self.application_id
