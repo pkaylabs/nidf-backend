@@ -25,7 +25,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'phone', 'password', 'name', 'church_profile')
+        fields = ('email', 'phone', 'password', 'name', 'church_profile', 'user_type',)
         extra_kwargs = {
             'password': {'write_only': True},  # Ensure the password is not included in responses
             'email': {'required': True},       # Email is required during registration
@@ -47,8 +47,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             email=validated_data.get('email'),
             password=validated_data.get('password'),
             name=validated_data.get('name'),
-            region=validated_data.get('region'),
-            district=validated_data.get('district'),
             church_profile=validated_data.get('church_profile'),
+            user_type=validated_data.get('user_type'),
         )
         return user
