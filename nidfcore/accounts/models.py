@@ -9,6 +9,8 @@ and their respective divisional profiles.
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 
+from nidfcore.utils.constants import UserType
+
 from .manager import AccountManager
 
 
@@ -17,6 +19,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=50, unique=True)
     phone = models.CharField(max_length=12, unique=True)
     name = models.CharField(max_length=255)
+    user_type = models.CharField(max_length=20, default=UserType.CHURCH_USER.value)
 
     church_profile = models.OneToOneField('Church', on_delete=models.CASCADE, null=True, blank=True)
 
