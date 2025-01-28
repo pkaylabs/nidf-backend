@@ -14,7 +14,7 @@ class UserAdmin(admin.ModelAdmin):
 # church
 @admin.register(Church)
 class ChurchAdmin(admin.ModelAdmin):
-    list_display = ('name', 'pastor_name', 'location', 'district__name')
+    list_display = ('name', 'pastor_name', 'district__name')
     search_fields = ('name', 'pastor_name', 'district__name',)
 
 # district

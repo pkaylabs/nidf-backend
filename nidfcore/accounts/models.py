@@ -46,7 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Church(models.Model):
     '''Church profile model'''
     name = models.CharField(max_length=255)
-    location = models.TextField()
+    address = models.TextField()
 
     # administator details
     pastor_name = models.CharField(max_length=255)
@@ -65,6 +65,7 @@ class Church(models.Model):
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name

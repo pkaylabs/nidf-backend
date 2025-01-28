@@ -42,7 +42,6 @@ class LoginAPI(APIView):
             "token": AuthToken.objects.create(user)[1],
         })
 
-
 class RegisterAPI(APIView):
     '''Register api endpoint'''
     permission_classes = (permissions.AllowAny,)
