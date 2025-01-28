@@ -43,3 +43,50 @@ class Application(models.Model):
 
     def __str__(self):
         return self.application_id
+
+
+class Repayment(models.Model):
+    '''Repayment model'''
+
+    def generate_repayment_id() -> str:
+        '''Generates a unique id for repayment record'''
+        sub = 'NIDF-RR-'
+        return sub + ''.join(random.choices(string.digits, k=7))
+
+    repayment_id = models.CharField(max_length=15, default=generate_repayment_id, unique=True)
+    application = models.ForeignKey(Application, on_delete=models.PROTECT)
+    amount = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    payment_reference = models.CharField(max_length=50, default='')
+    date_paid = models.DateField()
+    proof_of_payment = models.FileField(upload_to='repayments/')
+    status = models.CharField(max_length=15, default=ApplicationStatus.PENDING.value)
+
+    # stamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.repayment_id} - {self.amount}"
+    
+class ProgressReport(models.Model):
+    '''Progress report model'''
+    def generate_report_id() -> str:
+        '''Generates a unique id for progress report'''
+        sub = 'NIDF-PR-'
+        return sub + ''.join(random.choices(string.digits, k=7))
+    
+    report_id = models.CharField(max_length=15, default=generate_report_id, unique=True)
+    application = models.ForeignKey(Application, on_delete=models.PROTECT)
+    progress_description = models.TextField()
+    proof_of_progress = models.FileField(upload_to='progress/')
+    status = models.CharField(max_length=15, default=ApplicationStatus.PENDING.value)
+
+    # stamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+
+    def __str__(self):
+        return self.report_id
+    
