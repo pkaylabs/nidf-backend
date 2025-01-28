@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
-from accounts.models import User
+from accounts.models import Church, User
+from apis.models import Application
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,3 +52,11 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             user_type=validated_data.get('user_type'),
         )
         return user
+
+
+class ApplicationSerializers(serializers.ModelSerializer):
+    '''Serializer for applications'''
+    church = serializers.PrimaryKeyRelatedField(queryset=Church.objects.all())
+    class Meta:
+        model = Application
+        fields = "__all__"

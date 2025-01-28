@@ -14,5 +14,10 @@ urlpatterns += [
     path('login/', views.LoginAPI.as_view(), name='login'),
     path('register/', views.RegisterAPI.as_view(), name='register'),
     path('logout/', views.LogoutAPI.as_view(), name='logout'),
-     path('users/', views.UsersAPIView.as_view(), name='users'),
+    path('users/', views.UsersAPIView.as_view(), name='users'),
+]
+
+# application endpoints
+urlpatterns += [
+    path('applications/', views.ApplicationsAPIView.as_view(), name='applications'),
 ]

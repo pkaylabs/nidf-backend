@@ -56,11 +56,11 @@ class Church(models.Model):
     # church details
     church_phone = models.CharField(max_length=12)
     church_email = models.EmailField()
-    church_logo = models.ImageField(upload_to='churches/logos/')
+    church_logo = models.ImageField(upload_to='churches/logos/', null=True, blank=True)
 
     # heirarchy
-    district = models.ForeignKey('District', on_delete=models.CASCADE)
-    region = models.ForeignKey('Region', on_delete=models.CASCADE)
+    district = models.ForeignKey('District', on_delete=models.CASCADE, null=True, blank=True)
+    region = models.ForeignKey('Region', on_delete=models.CASCADE, null=True, blank=True)
 
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
