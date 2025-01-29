@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 
 from accounts.models import Church, User
-from apis.models import Application
+from apis.models import Application, Disbursement, ProgressReport, Repayment
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -69,3 +69,43 @@ class ApplicationSerializers(serializers.ModelSerializer):
         model = Application
         fields = "__all__"
         
+class AddRepaymentSerializer(serializers.ModelSerializer):
+    '''Serializer for repayments'''
+    class Meta:
+        model = Repayment
+        fields = "__all__"
+
+
+class GetRepaymentSerializer(serializers.ModelSerializer):
+    '''Serializer for repayments'''
+    application = ApplicationSerializers()
+    class Meta:
+        model = Repayment
+        fields = "__all__"
+
+
+class AddProgressReportSerializer(serializers.ModelSerializer):
+    '''Serializer for adding progress reports'''
+    class Meta:
+        model = ProgressReport
+        fields = "__all__"
+
+class GetProgressReportSerializer(serializers.ModelSerializer):
+    '''Serializer for getting progress reports'''
+    application = ApplicationSerializers()
+    class Meta:
+        model = ProgressReport
+        fields = "__all__"
+
+class AddDisbursementSerializer(serializers.ModelSerializer):
+    '''Serializer for adding disbursements'''
+    class Meta:
+        model = Disbursement
+        fields = "__all__"
+
+class GetDisbursementSerializer(serializers.ModelSerializer):
+    '''Serializer for getting disbursements'''
+    application = ApplicationSerializers()
+    class Meta:
+        model = Disbursement
+        fields = "__all__"

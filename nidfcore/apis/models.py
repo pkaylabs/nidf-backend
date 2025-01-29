@@ -92,3 +92,27 @@ class ProgressReport(models.Model):
     def __str__(self):
         return self.report_id
     
+
+class Disbursement(models.Model):
+    '''Disbursement model'''
+
+    def generate_disbursement_id() -> str:
+        '''Generates a unique id for disbursement record'''
+        sub = 'NIDF-DB-'
+        return sub + ''.join(random.choices(string.digits, k=7))
+
+    disbursement_id = models.CharField(max_length=15, default=generate_disbursement_id, unique=True)
+    application = models.ForeignKey(Application, on_delete=models.PROTECT)
+    amount = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    payment_reference = models.CharField(max_length=50, default='')
+    date_paid = models.DateField()
+    proof_of_payment = models.FileField(upload_to='disbursments/')
+    status = models.CharField(max_length=15, default=ApplicationStatus.PENDING.value)
+
+    # stamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.disbursement_id} - {self.amount}"
