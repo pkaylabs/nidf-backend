@@ -26,8 +26,13 @@ urlpatterns += [
     path('disbursements/', views.DisbursementsAPIView.as_view(), name='disbursements'),
 ]
 
-
 # dashboard
 urlpatterns += [
     path('dashboard/', views.DashboardAPIView.as_view(), name='dashboard'),
+]
+
+# church and divisions endpoints
+urlpatterns += [
+    path('churches/', views.ChurchesAPIView.as_view(), name='churches'),
+   
 ]

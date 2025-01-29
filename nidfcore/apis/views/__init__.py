@@ -5,6 +5,7 @@ from .repayments import *
 from .subdivisions import *
 from .users import *
 from .dashboard import *
+from .churches import *
 
 
 class PingAPI(APIView):
