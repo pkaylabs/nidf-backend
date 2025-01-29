@@ -6,10 +6,11 @@ and their respective divisional profiles.
 
 '''
 
+from datetime import timedelta, timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 
-from nidfcore.utils.constants import UserType
+from nidfcore.utils.constants import ApplicationStatus, UserType
 
 from .manager import AccountManager
 
@@ -41,7 +42,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.name
-    
+
+class OTP(models.Model):
+    '''One Time Password model'''
+    phone = models.CharField(max_length=12)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def is_expired(self) -> bool:
+        '''Returns True if the OTP is expired'''
+        return (self.created_at + timedelta(minutes=30)) < timezone.now()
+
+    def __str__(self):
+        return self.phone + ' - ' + self.otp
+
 
 class Church(models.Model):
     '''Church profile model'''
@@ -66,6 +81,30 @@ class Church(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+
+
+    def get_amount_received(self) -> float:
+        '''Returns the total amount received by the church in the form of disbursements'''
+        return sum([app.get_disbursed_amount() for app in self.application_set.all()])
+    
+    def get_amount_repaid(self) -> float:
+        '''Returns the total amount repaid by the church in the form of repayments'''
+        return sum([app.get_repayment_amount() for app in self.application_set.all() if app.status == ApplicationStatus.APPROVED.value])
+    
+    def get_repaid_percentage(self) -> float:
+        '''Returns the percentage of the total amount received that has been repaid'''
+        total_received = self.get_amount_received()
+        total_repaid = self.get_amount_repaid()
+        if total_received == 0:
+            return 0
+        return (total_repaid / total_received) * 100
+    
+    def get_next_due_date(self) -> str:
+        '''Returns the next due date for repayment'''
+        # it should be a month from the last repayment date
+        last_payment = self.application_set.all().order_by('-updated_at').first().repayment_set.all().order_by('-date_paid').first()
+        last_repayment_date = last_payment.date_paid if last_payment else self.application_set.all().order_by('-updated_at').first().created_at
+        return last_repayment_date + timedelta(days=30)
 
     def __str__(self):
         return self.name

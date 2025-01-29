@@ -4,6 +4,7 @@ from .disbursements import *
 from .repayments import *
 from .subdivisions import *
 from .users import *
+from .dashboard import *
 
 
 class PingAPI(APIView):

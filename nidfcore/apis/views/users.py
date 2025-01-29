@@ -5,7 +5,7 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.models import User
+from accounts.models import OTP, User
 from apis.serializers import (LoginSerializer, RegisterUserSerializer,
                               UserSerializer)
 from nidfcore.utils.constants import UserType
@@ -16,7 +16,7 @@ class LoginAPI(APIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = LoginSerializer
 
-    def post(self, request, format=None):
+    def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
@@ -44,11 +44,30 @@ class LoginAPI(APIView):
             "token": AuthToken.objects.create(user)[1],
         })
 
+
+class VerifyOTPAPI(APIView):
+    '''Verify OTP api endpoint'''
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        phone = user.phone
+        otp = request.data.get('otp')
+        if not otp:
+            return Response({'error': 'OTP is required'}, status=status.HTTP_400_BAD_REQUEST)
+        otp = OTP.objects.filter(phone=phone, otp=otp).first()
+        if not otp:
+            return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
+        if otp.is_expired():
+            return Response({'error': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
+        otp.delete()
+        return Response({'message': 'OTP verified successfully'}, status=status.HTTP_200_OK)
+
 class RegisterAPI(APIView):
     '''Register api endpoint'''
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request, format=None):
+    def post(self, request, *args, **kwargs):
         serializer = RegisterUserSerializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
@@ -75,7 +94,7 @@ class LogoutAPI(APIView):
     '''Logout api endpoint'''
     permission_classes = (permissions.IsAuthenticated,)
 
-    def post(self, request, format=None):
+    def post(self, request, *args, **kwargs):
         user = request.user
         AuthToken.objects.filter(user=user).delete()
         return Response({"status": "success"}, status=status.HTTP_200_OK)
@@ -118,13 +137,15 @@ class UsersAPIView(APIView):
             if existing_phone.exists():
                 return Response({'error': 'User with the same phone already exists'}, status=status.HTTP_400_BAD_REQUEST)
             user = request.user
-            if user.user_type == UserType.CHURCH_USER.value:
+            
+            if user.is_superuser or user.user_type == UserType.ADMIN.value:
+                # superusers and admins can create users
+                print(serializer.validated_data)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            elif user.user_type == UserType.CHURCH_USER.value:
                 # church users can only create users in their church
                 serializer.save(church_profile=user.church_profile, user_type=UserType.CHURCH_USER.value)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            elif user.is_superuser or user.user_type == UserType.ADMIN.value:
-                # superusers and admins can create users
-                serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response({'error': 'You are not allowed to create users'}, status=status.HTTP_403_FORBIDDEN)

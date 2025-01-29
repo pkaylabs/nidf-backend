@@ -43,6 +43,15 @@ class Application(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='updated_by')
 
+
+    def get_disbursed_amount(self) -> float:
+        '''Returns the total amount disbursed for the application'''
+        return sum([disb.amount for disb in self.disbursement_set.all()])
+    
+    def get_repayment_amount(self) -> float:
+        '''Returns the total amount repaid for the application'''
+        return sum([rep.amount for rep in self.repayment_set.all()])
+
     def __str__(self):
         return self.application_id
 
