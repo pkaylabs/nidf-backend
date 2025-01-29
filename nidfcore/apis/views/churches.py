@@ -29,27 +29,28 @@ class ChurchesAPIView(APIView):
         '''Adds a new church'''
         user = request.user
         otp_verified = user.phone_verified
-        if user.user_type == UserType.CHURCH_USER.value and user.church_profile:
+        if user.is_superuser and user.user_type == UserType.ADMIN.value:
+            # Admins can create a church for a church user
+            serializer = AddChurchSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(created_by=user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif user.user_type == UserType.CHURCH_USER.value and user.church_profile:
             # Church users can only create a church if they don't have one
             return Response({'error': 'Church already exists'}, status=status.HTTP_400_BAD_REQUEST)
         
-        if user.user_type == UserType.CHURCH_USER.value and not otp_verified:
+        elif user.user_type == UserType.CHURCH_USER.value and not otp_verified:
             # Church users can only create a church if their phone is verified
             return Response({'error': 'Phone not verified'}, status=status.HTTP_400_BAD_REQUEST)
         
-        if user.user_type == UserType.CHURCH_USER.value and not user.church_profile:
+        elif user.user_type == UserType.CHURCH_USER.value and not user.church_profile:
             serializer = AddChurchSerializer(data=request.data)
             if serializer.is_valid():
                 church = serializer.save(created_by=user)
                 user.church_profile = church
                 user.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        elif user.is_superuser and user.user_type == UserType.ADMIN.value:
-            # Admins can create a church for a church user
-            serializer = AddChurchSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save(created_by=user)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         # Unauthorized

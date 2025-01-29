@@ -1,4 +1,7 @@
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -137,3 +140,22 @@ REST_KNOX = {
 
 # django cors headers settings
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+# NOTIFICATION SETTINGS
+# email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_MAIL')
+ 
+# KEYS
+SENDER_ID = os.getenv('SMS_SENDER_ID') # 11 characters max
+
+# Get the key from .env file
+
+ARKESEL_API_KEY = os.getenv('ARKESEL_SMS_API_KEY')

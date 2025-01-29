@@ -1,10 +1,12 @@
+from datetime import timezone
 import random
 import string
 
 from django.db import models
 
-from accounts.models import Church, User
-from nidfcore.utils.constants import ApplicationStatus, ConstLists, SupportType
+from accounts.models import Church, District, Region, User
+from nidfcore.utils.constants import ApplicationStatus, ConstLists, Frequency, NotificationChannel, SupportType, Target
+from nidfcore.utils.services import send_sms
 
 
 class Application(models.Model):
@@ -125,3 +127,48 @@ class Disbursement(models.Model):
 
     def __str__(self):
         return f"{self.disbursement_id} - {self.amount}"
+    
+
+class Notification(models.Model):
+    '''Notification model'''
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_scheduled = models.BooleanField(default=False)
+    schedule_start_date = models.DateTimeField(null=True, blank=True)
+    schedule_frequency = models.CharField(max_length=20, default=Frequency.WEEKLY.value)
+
+    # stamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    broadcasted_at = models.DateTimeField(null=True, blank=True)
+    broadcasted_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='created_by')
+    
+    def broadcast(self, user: User, target: str, channel: str = NotificationChannel.SMS.value):
+        '''Broadcasts the notification to a user'''
+        if target == Target.ALL.value:
+            # get all the phones for the users
+            phones = [u.phone for u in User.objects.all()]
+        elif target == Target.CHURCH.value:
+            # get all the phones for the church and the pastor
+            phones = [u.pastor_phone for u in Church.objects.all()].extend([u.church_phone for u in Church.objects.all()])
+        elif target == Target.REGION.value:
+            # get all the phones for the region and the overseer
+            phones = [u.phone for u in Region.objects.all()].extend([u.overseer_phone for u in Region.objects.all()])
+        elif target == Target.DISTRICT.value:
+            # get all the phones for the district and the overseer
+            phones = [u.phone for u in District.objects.all()].extend([u.overseer_phone for u in District.objects.all()])
+        else:
+            # get the phone for the user
+            phones = [user.phone]
+
+        # send the notification to the phones
+        send_sms(recipients=phones, message=self.message)
+
+        self.broadcasted_by = user
+        self.broadcasted_at = timezone.now()
+        self.save()
+
+
+    def __str__(self):
+        return self.title

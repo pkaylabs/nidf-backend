@@ -23,6 +23,27 @@ class ApplicationStatus(Enum):
     REJECTED = 'REJECTED'
     DELETED = 'DELETED'
 
+
+class NotificationChannel(Enum):
+    '''Defines the notification channels allowed in the system'''
+    EMAIL = 'EMAIL'
+    SMS = 'SMS'
+
+class Frequency(Enum):
+    '''Defines the frequency of repayment'''
+    MONTHLY = 'MONTHLY'
+    FORTNIGHTLY = 'FORTNIGHTLY'
+    WEEKLY = 'WEEKLY'
+    DAILY = 'DAILY'
+
+
+class Target(Enum):
+    '''Defines the target for the notification'''
+    CHURCH = 'CHURCH'
+    DISTRICT = 'DISTRICT'
+    REGION = 'REGION'
+    ALL = 'ALL'
+
 class ConstLists:
     '''Defines the constant lists for the system'''
     user_types = [
