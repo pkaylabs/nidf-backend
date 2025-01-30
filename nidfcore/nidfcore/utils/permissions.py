@@ -16,4 +16,7 @@ class IsCentralAndSuperUser(BasePermission):
     """
     def has_permission(self, request, view):
         user = request.user
-        return user.is_authenticated and (user.is_superuser or user.user_type == UserType.FINANCE_OFFICER.value)
+        is_superuser = user.is_superuser
+        is_finance_officer = user.user_type == UserType.FINANCE_OFFICER.value
+        is_admin_user = user.user_type == UserType.ADMIN.value
+        return user.is_authenticated and (is_superuser or is_finance_officer or is_admin_user)

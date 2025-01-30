@@ -21,8 +21,18 @@ urlpatterns += [
 # application (and associates) endpoints
 urlpatterns += [
     path('applications/', views.ApplicationsAPIView.as_view(), name='applications'),
+    path('process-application/', views.ProcessApplicationsAPIView.as_view(), name='process_app'),
+    path('extra-application-info/', views.AdditionalInformationAPIView.as_view(), name='extra_info'),
+]
+
+# reports and repayments
+urlpatterns += [
     path('repayments/', views.RepaymensAPIView.as_view(), name='repayments'),
     path('progressreports/', views.ProgressReportsAPIView.as_view(), name='progressreports'),
+]
+
+# disbursements
+urlpatterns += [
     path('disbursements/', views.DisbursementsAPIView.as_view(), name='disbursements'),
 ]
 
@@ -34,5 +44,4 @@ urlpatterns += [
 # church and divisions endpoints
 urlpatterns += [
     path('churches/', views.ChurchesAPIView.as_view(), name='churches'),
-   
 ]

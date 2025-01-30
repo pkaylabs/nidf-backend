@@ -2,10 +2,11 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.models import Church
 from apis.models import Application
 from apis.serializers import ApplicationSerializers
-from nidfcore.utils.constants import UserType
+from nidfcore.utils.constants import ApplicationStatus, UserType
+from nidfcore.utils.permissions import IsCentralAndSuperUser
+from nidfcore.utils.services import send_sms
 
 
 class ApplicationsAPIView(APIView):
@@ -70,3 +71,77 @@ class ApplicationsAPIView(APIView):
 
         # there was an error in the data
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProcessApplicationsAPIView(APIView):
+    '''enpoint to process applications: approve, reject'''
+
+    permission_classes =( IsCentralAndSuperUser,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        is_superuser = user.is_superuser
+        is_finance_officer = user.user_type == UserType.FINANCE_OFFICER.value
+        is_admin_user = user.user_type == UserType.ADMIN.value
+
+        if not (is_superuser or is_admin_user or is_finance_officer):
+            # deny access to any user not in the ADMIN category
+            return Response({"message": "You are not allowed to process application"},  status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            application_status = request.data.get('status')
+            application_id = request.data.get('application')
+
+            application = Application.objects.filter(application_id=application_id).first()
+            if application == None:
+                return Response({"message": "Application not found"},  status=status.HTTP_404_NOT_FOUND)
+            
+            # the only allowed statuses at the moment are 'APPROVED' and 'REJECTED'
+            if application_status.upper() == ApplicationStatus.APPROVED.value:
+                application.status = ApplicationStatus.APPROVED.value
+                application.updated_by = user
+                application.save()
+                return Response({"message": "Application Status Changed"},  status=status.HTTP_200_OK)
+            elif application_status.upper() == ApplicationStatus.REJECTED.value:
+                application.status = ApplicationStatus.REJECTED.value
+                application.updated_by = user
+                application.save()
+                return Response({"message": "Application Status Changed"},  status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "Status is not acceptable"},  status=status.HTTP_406_NOT_ACCEPTABLE)
+            
+
+class AdditionalInformationAPIView(APIView):
+    '''endpoint to request for additional information from applicants'''
+
+    permission_classes =( IsCentralAndSuperUser,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        is_superuser = user.is_superuser
+        is_finance_officer = user.user_type == UserType.FINANCE_OFFICER.value
+        is_admin_user = user.user_type == UserType.ADMIN.value
+
+        if not (is_superuser or is_admin_user or is_finance_officer):
+            # deny access to any user not in the ADMIN category
+            return Response({"message": "You are not allowed to perform this action"},  status=status.HTTP_401_UNAUTHORIZED)
+        
+        message = request.data.get('message')
+        application_id = request.data.get('application')
+
+        application = Application.objects.filter(application_id=application_id).first()
+        if application == None:
+            return Response({"message": "Application not found"},  status=status.HTTP_404_NOT_FOUND)
+        
+        if message.strip() == '' or message == None:
+            return Response({"message": "Message is required"},  status=status.HTTP_404_NOT_FOUND)
+        
+        phones = [application.church.pastor_phone, application.church.church_phone]
+
+        # format the message
+        title = "NIDF Request for Info."
+        msg = title + "\n" + message
+
+        # send sms to user
+        send_sms(message=msg, recipients=phones)
+
+        return Response({"message": "Request Sent Successfully"},  status=status.HTTP_200_OK)

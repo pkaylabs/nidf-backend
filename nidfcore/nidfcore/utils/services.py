@@ -5,7 +5,7 @@ import requests
 from nidfcore import settings
 
 
-def send_sms(sender: str, message: str, recipients: array.array):
+def send_sms(message: str, recipients: array.array, sender: str = settings.SENDER_ID):
     '''Sends an SMS to the specified recipients'''
     header = {"api-key": settings.ARKESEL_API_KEY, 'Content-Type': 'application/json',
               'Accept': 'application/json'}
