@@ -135,6 +135,7 @@ class Notification(models.Model):
     message = models.TextField()
     is_scheduled = models.BooleanField(default=False)
     schedule_start_date = models.DateTimeField(null=True, blank=True)
+    schedule_start_end = models.DateTimeField(null=True, blank=True)
     schedule_frequency = models.CharField(max_length=20, default=Frequency.WEEKLY.value)
 
     # stamps
