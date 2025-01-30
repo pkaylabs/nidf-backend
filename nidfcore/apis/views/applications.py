@@ -65,12 +65,31 @@ class ApplicationsAPIView(APIView):
                 {
                     "message": "Application Created Successfully",
                     "application": serializer.data
-                },
-                status=status.HTTP_201_CREATED
-            )
+                }, status=status.HTTP_201_CREATED)
 
         # there was an error in the data
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, *args, **kwargs):
+        '''uses put method to mark application as submitted (pending review).'''
+        user = request.user
+        applicationid = request.data.get('application')
+
+        if user.is_superuser or user.user_type == UserType.ADMIN.value:
+            # admins can submit any application
+            application = Application.objects.filter(application_id=applicationid).first()
+        else:
+            # church users can only submit applications belonging to their church
+            application = Application.objects.filter(church=user.church_profile, application_id=applicationid).first()
+
+        if application == None:
+            return Response({"message": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            application.status = ApplicationStatus.PENDING.value
+            application.updated_by = user
+            application.save()
+            return Response({"message": "Application Submitted Successfully"}, status=status.HTTP_200_OK)
+
 
 
 class ProcessApplicationsAPIView(APIView):
@@ -143,5 +162,10 @@ class AdditionalInformationAPIView(APIView):
 
         # send sms to user
         send_sms(message=msg, recipients=phones)
+
+        # change the status back to draft
+        application.status = ApplicationStatus.DRAFT.value
+        application.updated_by = user
+        application.save()
 
         return Response({"message": "Request Sent Successfully"},  status=status.HTTP_200_OK)

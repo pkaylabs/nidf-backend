@@ -142,7 +142,10 @@ class District(models.Model):
     overseer_phone = models.CharField(max_length=12)
     overseer_email = models.EmailField()
 
-    # region details
+    # region
+    region = models.ForeignKey(Region, on_delete=models.PROTECT, null=True, blank=True)
+
+    # district details
     phone = models.CharField(max_length=12)
     email = models.EmailField()
 

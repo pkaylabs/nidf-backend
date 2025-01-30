@@ -2,7 +2,7 @@ from .applications import *
 from .progressreport import *
 from .disbursements import *
 from .repayments import *
-from .subdivisions import *
+from .divisions import *
 from .users import *
 from .dashboard import *
 from .churches import *

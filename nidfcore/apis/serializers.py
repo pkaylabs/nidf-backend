@@ -111,8 +111,9 @@ class GetDisbursementSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class DistrictSerializer(serializers.ModelSerializer):
+class AddDistrictSerializer(serializers.ModelSerializer):
     '''Serializer for districts'''
+    region = serializers.PrimaryKeyRelatedField(queryset=Region.objects.all())
     class Meta:
         model = District
         fields = "__all__"
@@ -124,18 +125,23 @@ class RegionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class GetDistrictSerializer(serializers.ModelSerializer):
+    '''Serializer for districts'''
+    region = RegionSerializer()
+    class Meta:
+        model = District
+        fields = "__all__"
+
 class AddChurchSerializer(serializers.ModelSerializer):
     '''Serializer for adding churches'''
     district = serializers.PrimaryKeyRelatedField(queryset=District.objects.all())
-    region = serializers.PrimaryKeyRelatedField(queryset=Region.objects.all())
     class Meta:
         model = Church
         fields = "__all__"
 
 class GetChurchSerializer(serializers.ModelSerializer):
     '''Serializer for getting churches'''
-    district = DistrictSerializer()
-    region = RegionSerializer()
+    district = GetDistrictSerializer()
     class Meta:
         model = Church
         fields = "__all__"
