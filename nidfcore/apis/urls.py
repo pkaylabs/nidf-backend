@@ -45,5 +45,5 @@ urlpatterns += [
 urlpatterns += [
     path('churches/', views.ChurchesAPIView.as_view(), name='churches'),
     path('regions/', views.RegionsAPIView.as_view(), name='regions'),
-    path('districts/', views.ChurchesAPIView.as_view(), name='districts'),
+    path('districts/', views.DistrictsAPIView.as_view(), name='districts'),
 ]
