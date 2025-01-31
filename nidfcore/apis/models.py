@@ -38,6 +38,12 @@ class Application(models.Model):
     phase = models.CharField(max_length=100, default='')
     description = models.TextField(null=True, blank=True) 
     status = models.CharField(max_length=20, default=ApplicationStatus.DRAFT.value)
+
+    # documents
+    current_stage = models.FileField(upload_to='applications/current_stage/', null=True, blank=True)
+    cost_estimate = models.FileField(upload_to='applications/cost_estimate/', null=True, blank=True)
+    land_ownership = models.FileField(upload_to='applications/land_ownership/', null=True, blank=True)
+    invoices = models.FileField(upload_to='applications/invoices/', null=True, blank=True)
     
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
