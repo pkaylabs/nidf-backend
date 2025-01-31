@@ -120,6 +120,11 @@ class Disbursement(models.Model):
     proof_of_payment = models.FileField(upload_to='disbursments/')
     status = models.CharField(max_length=15, default=ApplicationStatus.PENDING.value)
 
+    # bank details
+    bank_name = models.CharField(max_length=100, blank=True, null=True)
+    account_name = models.CharField(max_length=100, blank=True, null=True)
+    account_number = models.CharField(max_length=100, blank=True, null=True)
+
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
