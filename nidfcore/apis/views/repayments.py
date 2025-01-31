@@ -61,14 +61,23 @@ class VerifyRepaymentAPIView(APIView):
             return Response({"message": "You are not allowed to verify repayment"}, status=status.HTTP_401_UNAUTHORIZED)
         
         repayment_id = request.data.get('repaymentid')
+        repayment_status = request.data.get('status')
         repayment = Repayment.objects.filter(repayment_id=repayment_id).first()
 
         if repayment == None:
             return Response({"message": "Repayment record not found"}, status=status.HTTP_404_NOT_FOUND)
         
-        # change the status to verified
-        repayment.status = ApplicationStatus.VERIFIED.value
+        if repayment_status.upper() not in [ApplicationStatus.APPROVED.value, ApplicationStatus.VERIFIED.value, ApplicationStatus.REJECTED.value]:
+            return Response({"message": "Status not acceptable"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+        
+        # change the status...
+        if repayment_status.upper() in [ApplicationStatus.APPROVED.value, ApplicationStatus.VERIFIED.value]:
+            repayment.status = ApplicationStatus.VERIFIED.value
+            msg = "Repayment Record Verified Successfully"
+        else:
+            repayment.status = ApplicationStatus.REJECTED.value
+            msg = "Repayment Record Rejected Successfully"
         repayment.updated_by = user
         repayment.save()
 
-        return Response({"message": "Repayment Record Verified Successfully"}, status=status.HTTP_200_OK)
+        return Response({"message": msg}, status=status.HTTP_200_OK)

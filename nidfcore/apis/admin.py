@@ -17,6 +17,13 @@ class RepaymentAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     search_fields = ('repayment_id', 'application_application_id',)
 
+# disbursement
+@admin.register(Disbursement)
+class DisbursementAdmin(admin.ModelAdmin):
+    list_display = ('disbursement_id', 'application', 'amount', 'status', 'created_at',)
+    list_filter = ('status',)
+    search_fields = ('disbursement_id', 'application_application_id',)
+
 # Progress Report
 @admin.register(ProgressReport)
 class ProgressReportAdmin(admin.ModelAdmin):
