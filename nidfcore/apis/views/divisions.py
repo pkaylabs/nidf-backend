@@ -13,7 +13,7 @@ class RegionsAPIView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        # anyone user can get all regions
+        # anyone user can get all regions or a single region if a param is parsed
         param = request.query_params.get('query')
         districts = []
         if param == None:
