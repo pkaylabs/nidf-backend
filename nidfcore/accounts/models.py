@@ -112,7 +112,7 @@ class Church(models.Model):
 
 class Region(models.Model):
     '''Region model'''
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     location = models.TextField()
 
     # overseer details

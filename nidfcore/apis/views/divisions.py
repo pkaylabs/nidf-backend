@@ -14,10 +14,20 @@ class RegionsAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         # anyone user can get all regions
-        regions = Region.objects.all().order_by('name')
-        serializer = RegionSerializer(regions, many=True)
+        param = request.query_params.get('query')
+        districts = []
+        if param == None:
+            regions = Region.objects.all().order_by('name')
+            many = True
+        else:
+            regions = Region.objects.filter(name=param).first()
+            if regions is not None:
+                districts = District.objects.filter(region=regions)
+            many = False
+        serializer = RegionSerializer(regions, many=many)
+        district_serializer = GetDistrictSerializer(districts, many=True)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"region":serializer.data, "districts":district_serializer.data }, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
         user = request.user
