@@ -4,7 +4,8 @@ from rest_framework.views import APIView
 
 from apis.models import Repayment
 from apis.serializers import AddRepaymentSerializer, GetRepaymentSerializer
-from nidfcore.utils.constants import UserType
+from nidfcore.utils.constants import ApplicationStatus, UserType
+from nidfcore.utils.permissions import IsCentralAndSuperUser
 
 
 class RepaymensAPIView(APIView):
@@ -45,3 +46,29 @@ class RepaymensAPIView(APIView):
             repayment = serializer.save(created_by=request.user)
             return Response(GetRepaymentSerializer(repayment).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class VerifyRepaymentAPIView(APIView):
+    '''Endpoint to verify repayments'''
+
+    permission_classes = [IsCentralAndSuperUser]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if not (user.user_type == UserType.FINANCE_OFFICER.value):
+            # only finance office can verify repayments
+            return Response({"message": "You are not allowed to verify repayment"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        repayment_id = request.data.get('repaymentid')
+        repayment = Repayment.objects.filter(repayment_id=repayment_id).first()
+
+        if repayment == None:
+            return Response({"message": "Repayment record not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # change the status to verified
+        repayment.status = ApplicationStatus.VERIFIED.value
+        repayment.updated_by = user
+        repayment.save()
+
+        return Response({"message": "Repayment Record Verified Successfully"}, status=status.HTTP_200_OK)

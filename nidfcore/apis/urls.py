@@ -28,6 +28,7 @@ urlpatterns += [
 # reports and repayments
 urlpatterns += [
     path('repayments/', views.RepaymensAPIView.as_view(), name='repayments'),
+    path('verifyrepayments/', views.VerifyRepaymentAPIView.as_view(), name='verify_repayments'),
     path('progressreports/', views.ProgressReportsAPIView.as_view(), name='progressreports'),
     path('verifyreports/', views.VerifyProgressReportAPIView.as_view(), name='verify_reports'),
 ]
