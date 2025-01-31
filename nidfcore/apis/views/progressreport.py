@@ -4,7 +4,8 @@ from rest_framework.views import APIView
 
 from apis.models import ProgressReport
 from apis.serializers import AddProgressReportSerializer, GetProgressReportSerializer
-from nidfcore.utils.constants import UserType
+from nidfcore.utils.constants import ApplicationStatus, UserType
+from nidfcore.utils.permissions import IsCentralAndSuperUser
 
 
 class ProgressReportsAPIView(APIView):
@@ -47,3 +48,29 @@ class ProgressReportsAPIView(APIView):
             progress_report = serializer.save(created_by=request.user)
             return Response(GetProgressReportSerializer(progress_report).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class VerifyProgressReportAPIView(APIView):
+    '''Endpoint to verify progress reports'''
+
+    permission_classes = [IsCentralAndSuperUser]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if not (user.is_superuser or user.user_type == UserType.ADMIN.value):
+            # deny access to anyone not superuser or admin user
+            return Response({"message": "You are not allowed to verify progress report"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        report_id = request.data.get('reportid')
+        report = ProgressReport.objects.filter(report_id=report_id).first()
+
+        if report == None:
+            return Response({"message": "Report not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # change the status to verified
+        report.status = ApplicationStatus.VERIFIED.value
+        report.updated_by = user
+        report.save()
+
+        return Response({"message": "Progress Report Verified Successfully"}, status=status.HTTP_200_OK)

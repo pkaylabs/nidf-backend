@@ -21,6 +21,7 @@ class ApplicationStatus(Enum):
     PENDING = 'PENDING REVIEW'
     APPROVED = 'APPROVED'
     REJECTED = 'REJECTED'
+    VERIFIED = 'VERIFIED'
     DELETED = 'DELETED'
 
 
