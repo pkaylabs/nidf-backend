@@ -1,11 +1,12 @@
-from datetime import timezone
 import random
 import string
+from datetime import timezone
 
 from django.db import models
 
 from accounts.models import Church, District, Region, User
-from nidfcore.utils.constants import ApplicationStatus, ConstLists, Frequency, NotificationChannel, SupportType, Target
+from nidfcore.utils.constants import (ApplicationStatus, ConstLists, Frequency,
+                                      NotificationChannel, SupportType, Target)
 from nidfcore.utils.services import send_sms
 
 

@@ -1,11 +1,11 @@
 from .applications import *
-from .progressreport import *
-from .disbursements import *
-from .repayments import *
-from .divisions import *
-from .users import *
-from .dashboard import *
 from .churches import *
+from .dashboard import *
+from .disbursements import *
+from .divisions import *
+from .progressreport import *
+from .repayments import *
+from .users import *
 
 
 class PingAPI(APIView):

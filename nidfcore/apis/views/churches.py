@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import Church
-from apis.serializers import GetChurchSerializer, AddChurchSerializer
+from apis.serializers import AddChurchSerializer, GetChurchSerializer
 from nidfcore.utils.constants import UserType
 
 

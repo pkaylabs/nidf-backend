@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import Church, District, Region
-from apis.serializers import AddDistrictSerializer, GetChurchSerializer, GetDistrictSerializer, RegionSerializer
+from apis.serializers import (AddDistrictSerializer, GetChurchSerializer,
+                              GetDistrictSerializer, RegionSerializer)
 from nidfcore.utils.constants import UserType
 
 

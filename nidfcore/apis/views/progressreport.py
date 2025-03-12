@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apis.models import ProgressReport
-from apis.serializers import AddProgressReportSerializer, GetProgressReportSerializer
+from apis.serializers import (AddProgressReportSerializer,
+                              GetProgressReportSerializer)
 from nidfcore.utils.constants import ApplicationStatus, UserType
 from nidfcore.utils.permissions import IsCentralAndSuperUser
 
