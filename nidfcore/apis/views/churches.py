@@ -13,17 +13,11 @@ class ChurchesAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         '''Returns a list of churches'''
-        user = request.user
-        if user.is_superuser or user.user_type == UserType.ADMIN.value or user.user_type == UserType.FINANCE_OFFICER.value:
-            churches = Church.objects.all().order_by('name')
-            serializer = GetChurchSerializer(churches, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        elif user.user_type == UserType.CHURCH_USER.value:
-            church = user.church_profile
-            serializer = GetChurchSerializer(church)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        # everyone can view the list of churches
+        churches = Church.objects.all().order_by('name')
+        serializer = GetChurchSerializer(churches, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     def post(self, request, *args, **kwargs):
         '''Adds a new church'''
