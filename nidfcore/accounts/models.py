@@ -98,6 +98,10 @@ class Church(models.Model):
         '''Returns the total amount repaid by the church in the form of repayments'''
         return sum([app.get_repayment_amount() for app in self.application_set.all() if app.status == ApplicationStatus.APPROVED.value])
     
+    def get_arrears(self) -> float:
+        '''Returns the total arrears of the church'''
+        return self.get_amount_received() - self.get_amount_repaid()
+    
     def get_repaid_percentage(self) -> float:
         '''Returns the percentage of the total amount received that has been repaid'''
         total_received = self.get_amount_received()
@@ -109,8 +113,12 @@ class Church(models.Model):
     def get_next_due_date(self) -> str:
         '''Returns the next due date for repayment'''
         # it should be a month from the last repayment date
-        last_payment = self.application_set.all().order_by('-updated_at').first().repayment_set.all().order_by('-date_paid').first()
-        last_repayment_date = last_payment.date_paid if last_payment else self.application_set.all().order_by('-updated_at').first().created_at
+        last_application = self.application_set.all().order_by('-updated_at').first()
+        last_payment = last_application.repayment_set.all().order_by('-date_paid').first() if last_application else None
+        if last_payment:
+            last_repayment_date = last_payment.date_paid
+        else:
+            last_repayment_date = last_application.created_at if last_application else timezone.now()
         return last_repayment_date + timedelta(days=30)
 
     def __str__(self):

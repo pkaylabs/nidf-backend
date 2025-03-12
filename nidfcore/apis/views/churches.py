@@ -33,7 +33,7 @@ class ChurchesAPIView(APIView):
         
         elif user.user_type == UserType.CHURCH_USER.value and user.church_profile:
             # Church users can only create a church if they don't have one
-            return Response({'error': 'Church already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Church Already Exists'}, status=status.HTTP_400_BAD_REQUEST)
         
         elif user.user_type == UserType.CHURCH_USER.value and not otp_verified:
             # Church users can only create a church if their phone is verified
