@@ -53,9 +53,16 @@ class OTP(models.Model):
     def is_expired(self) -> bool:
         '''Returns True if the OTP is expired'''
         return (self.created_at + timedelta(minutes=30)) < timezone.now()
+    
+    def send_otp(self) -> None:
+        '''Send the OTP to the user'''
+        from nidfcore.utils.services import send_sms
+        message = f"Welcome to the DL NIDF Ghana platform.\n\nYour OTP is {self.otp}.\n\nPlease do not share this with anyone."
+        send_sms(message, [self.phone])
+
 
     def __str__(self):
-        return self.phone + ' - ' + self.otp
+        return self.phone + ' - ' + str(self.otp)
 
 
 class Church(models.Model):
