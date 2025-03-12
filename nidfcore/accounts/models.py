@@ -75,7 +75,6 @@ class Church(models.Model):
 
     # heirarchy
     district = models.ForeignKey('District', on_delete=models.CASCADE, null=True, blank=True)
-    region = models.ForeignKey('Region', on_delete=models.CASCADE, null=True, blank=True)
 
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
