@@ -157,5 +157,4 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_MAIL')
 SENDER_ID = os.getenv('SMS_SENDER_ID') # 11 characters max
 
 # Get the key from .env file
-
 ARKESEL_API_KEY = os.getenv('ARKESEL_SMS_API_KEY')
