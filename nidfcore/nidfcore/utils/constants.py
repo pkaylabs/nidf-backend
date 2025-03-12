@@ -45,6 +45,14 @@ class Target(Enum):
     REGION = 'REGION'
     ALL = 'ALL'
 
+
+class ChurchType(Enum):
+    '''Defines the types of churches in the system'''
+    REGIONAL = 'REGIONAL'
+    DIVISIONAL = 'DIVISIONAL'
+    LOCATION = 'LOCATION'
+
+
 class ConstLists:
     '''Defines the constant lists for the system'''
     user_types = [

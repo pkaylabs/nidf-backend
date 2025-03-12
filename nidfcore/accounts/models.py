@@ -12,7 +12,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 
-from nidfcore.utils.constants import ApplicationStatus, UserType
+from nidfcore.utils.constants import ApplicationStatus, ChurchType, UserType
 
 from .manager import AccountManager
 
@@ -81,6 +81,7 @@ class Church(models.Model):
     church_phone = models.CharField(max_length=12)
     church_email = models.EmailField()
     church_logo = models.ImageField(upload_to='churches/logos/', null=True, blank=True)
+    church_type = models.CharField(max_length=20, default=ChurchType.LOCATION.value)
 
     # heirarchy
     district = models.ForeignKey('District', on_delete=models.CASCADE, null=True, blank=True)
