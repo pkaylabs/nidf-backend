@@ -23,6 +23,10 @@ class Command(BaseCommand):
             
             if process.returncode == 0:
                 self.stdout.write(self.style.SUCCESS(f"Success: {command}"))
+                if command == "sudo service nginx restart":
+                    self.stdout.write(self.style.SUCCESS("====================="))
+                    self.stdout.write(self.style.SUCCESS("Deployment Successful"))
+                    self.stdout.write(self.style.SUCCESS("====================="))
             else:
                 self.stderr.write(self.style.ERROR(f"Error running {command}: {process.stderr}"))
 
