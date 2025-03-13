@@ -145,7 +145,7 @@ REST_KNOX = {
 # DRF Spectacular Configuration
 SPECTACULAR_SETTINGS = {
     'TITLE': 'NIDF API',
-    'DESCRIPTION': 'API for NIDF',
+    'DESCRIPTION': 'API Documentation for NIDF',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
