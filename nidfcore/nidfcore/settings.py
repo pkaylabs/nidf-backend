@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     # Third party apps
     'rest_framework',
     'knox',
+    'drf_spectacular',
 
 ]
 
@@ -133,11 +134,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'knox.auth.TokenAuthentication',
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 # knox - make token non-expiry
 REST_KNOX = {
     'TOKEN_TTL': None,
+}
+
+# DRF Spectacular Configuration
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'NIDF API',
+    'DESCRIPTION': 'API for NIDF',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 # django cors headers settings

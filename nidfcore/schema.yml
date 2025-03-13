@@ -1,0 +1,346 @@
+openapi: 3.0.3
+info:
+  title: NIDF API
+  version: 1.0.0
+  description: API for NIDF
+paths:
+  /api-v1/:
+    get:
+      operationId: api_v1_retrieve
+      description: An endpoint to test if the API is up and running
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api-v1/applications/:
+    get:
+      operationId: api_v1_applications_retrieve
+      description: API Endpoints for applications
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_applications_create
+      description: POST request to create or update an application
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: api_v1_applications_update
+      description: uses put method to mark application as submitted (pending review).
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/churches/:
+    get:
+      operationId: api_v1_churches_retrieve
+      description: Returns a list of churches
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_churches_create
+      description: Adds a new church
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/dashboard/:
+    get:
+      operationId: api_v1_dashboard_retrieve
+      description: GET request
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/disbursements/:
+    get:
+      operationId: api_v1_disbursements_retrieve
+      description: Handles GET requests
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_disbursements_create
+      description: Handles POST requests
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/divisions/:
+    get:
+      operationId: api_v1_divisions_retrieve
+      description: Endpoint for getting and creating divisions
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_divisions_create
+      description: Endpoint for getting and creating divisions
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api-v1/extra-application-info/:
+    post:
+      operationId: api_v1_extra_application_info_create
+      description: endpoint to request for additional information from applicants
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/login/:
+    post:
+      operationId: api_v1_login_create
+      description: Login api endpoint
+      tags:
+      - api-v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /api-v1/logout/:
+    post:
+      operationId: api_v1_logout_create
+      description: Logout api endpoint
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/process-application/:
+    post:
+      operationId: api_v1_process_application_create
+      description: 'enpoint to process applications: approve, reject'
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/progressreports/:
+    get:
+      operationId: api_v1_progressreports_retrieve
+      description: Get all progress reports
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_progressreports_create
+      description: Create a new progress report
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/regions/:
+    get:
+      operationId: api_v1_regions_retrieve
+      description: Endpoint for getting and creating regions
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_regions_create
+      description: Endpoint for getting and creating regions
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/register/:
+    post:
+      operationId: api_v1_register_create
+      description: Register api endpoint
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api-v1/repayments/:
+    get:
+      operationId: api_v1_repayments_retrieve
+      description: Get all repayments
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_repayments_create
+      description: Create a new repayment
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/users/:
+    get:
+      operationId: api_v1_users_retrieve
+      description: |-
+        Get all users: superusers get all users,
+        church users get only users in their church,
+        other users get only themselves
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_v1_users_create
+      description: POST request to create a new user
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: api_v1_users_destroy
+      description: Delete a user
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: No response body
+  /api-v1/verifyotp/:
+    post:
+      operationId: api_v1_verifyotp_create
+      description: Verify OTP api endpoint
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/verifyrepayments/:
+    post:
+      operationId: api_v1_verifyrepayments_create
+      description: Endpoint to verify repayments
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+  /api-v1/verifyreports/:
+    post:
+      operationId: api_v1_verifyreports_create
+      description: Endpoint to verify progress reports
+      tags:
+      - api-v1
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+      - email
+      - password
+  securitySchemes:
+    knoxApiToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
