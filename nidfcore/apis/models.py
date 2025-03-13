@@ -101,6 +101,7 @@ class ProgressReport(models.Model):
     progress_description = models.TextField()
     proof_of_progress = models.FileField(upload_to='progress/')
     status = models.CharField(max_length=15, default=ApplicationStatus.PENDING.value)
+    activity_completed = models.BooleanField(default=False)
 
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
