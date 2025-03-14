@@ -61,6 +61,8 @@ class VerifyOTPAPI(APIView):
         if otp.is_expired():
             return Response({'error': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
         otp.delete()
+        user.phone_verified = True
+        user.save()
         return Response({'message': 'OTP verified successfully'}, status=status.HTTP_200_OK)
 
 class RegisterAPI(APIView):
