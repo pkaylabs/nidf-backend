@@ -15,6 +15,7 @@ urlpatterns += [
     path('register/', views.RegisterAPI.as_view(), name='register'),
     path('logout/', views.LogoutAPI.as_view(), name='logout'),
     path('users/', views.UsersAPIView.as_view(), name='users'),
+    path('userprofile/', views.UserProfileAPIView.as_view(), name='userprofile'),
     path('verifyotp/', views.VerifyOTPAPI.as_view(), name='verifyotp'),
 ]
 

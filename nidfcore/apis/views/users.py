@@ -178,4 +178,22 @@ class UsersAPIView(APIView):
             return Response({'error': 'You are not allowed to delete users'}, status=status.HTTP_403_FORBIDDEN)
 
 
-    
+class UserProfileAPIView(APIView):
+    '''API endpoint to get and update user profile'''
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        '''Get user profile'''
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        '''Update user profile'''
+        user = request.user
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
