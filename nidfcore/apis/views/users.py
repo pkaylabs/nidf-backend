@@ -10,6 +10,8 @@ from apis.serializers import (LoginSerializer, RegisterUserSerializer,
                               UserSerializer)
 from nidfcore.utils.constants import UserType
 
+import random
+
 
 class LoginAPI(APIView):
     '''Login api endpoint'''
@@ -48,6 +50,19 @@ class LoginAPI(APIView):
 class VerifyOTPAPI(APIView):
     '''Verify OTP api endpoint'''
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        '''Use this endpoint to send OTP to the user'''
+        user = request.user
+        phone = user.phone
+        code = random.randint(1000, 9999)
+        try:
+            OTP.objects.filter(phone=phone).delete()
+            otp = OTP.objects.create(phone=phone, otp=code)
+            otp.send_otp()
+        except Exception as e:
+            return Response({'error': 'Failed to send OTP'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'message': 'OTP sent successfully'}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         user = request.user
