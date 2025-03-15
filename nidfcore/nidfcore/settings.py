@@ -31,8 +31,8 @@ INSTALLED_APPS = [
     'apis.apps.ApisConfig',
 
     # Third party apps
-    'rest_framework',
     'corsheaders',
+    'rest_framework',
     'knox',
     'drf_spectacular',
 
