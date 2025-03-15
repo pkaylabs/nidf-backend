@@ -28,6 +28,7 @@ class DashboardAPIView(APIView):
                 'amount_received': church.get_amount_received(),
                 'amount_repaid': church.get_amount_repaid(),
                 'arrears': church.get_arrears(),
+                'last_payment': church.get_last_repayment_date(),
                 'repayment_percentage': church.get_repaid_percentage(),
                 'next_due_date': church.get_next_due_date(),
             }, status=status.HTTP_200_OK)

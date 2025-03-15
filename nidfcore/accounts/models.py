@@ -42,6 +42,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['phone', 'name']
 
+    def get_church_logo(self) -> str:
+        '''Returns the church logo'''
+        if self.church_profile and self.church_profile.church_logo:
+            return self.church_profile.church_logo.url
+        return None
+
     def __str__(self):
         return self.name
 
@@ -111,6 +117,17 @@ class Church(models.Model):
         if total_received == 0:
             return 0
         return (total_repaid / total_received) * 100
+    
+    def get_last_repayment_date(self) -> any:
+        '''Returns the last repayment date'''
+        last_application = self.application_set.all().order_by('-updated_at').first()
+        last_payment = last_application.repayment_set.all().order_by('-date_paid').first() if last_application else None
+        if last_payment:
+            last_payment_date = last_payment.date_paid
+            # convert to string format: dd/mm/yyyy
+            last_payment_date = last_payment_date.strftime('%d/%m/%Y')
+            return last_payment_date
+        return "None"
     
     def get_next_due_date(self) -> str:
         '''Returns the next due date for repayment'''

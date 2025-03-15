@@ -42,7 +42,7 @@ class LoginAPI(APIView):
         # Delete existing token
         AuthToken.objects.filter(user=user).delete()
         return Response({
-            "user": UserSerializer(user).data,
+            "user": {**UserSerializer(user).data, "church_logo": user.get_church_logo()},
             "token": AuthToken.objects.create(user)[1],
         })
 
@@ -202,7 +202,10 @@ class UserProfileAPIView(APIView):
         '''Get user profile'''
         user = request.user
         serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # inject the church logo
+        serializer.data['church_logo'] = user.get_church_logo()
+        print(serializer.data)
+        return Response({**serializer.data, "church_logo": user.get_church_logo()}, status=status.HTTP_200_OK)
 
     def put(self, request, *args, **kwargs):
         '''Update user profile'''
@@ -210,5 +213,5 @@ class UserProfileAPIView(APIView):
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({**serializer.data, "church_logo": user.get_church_logo()}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
