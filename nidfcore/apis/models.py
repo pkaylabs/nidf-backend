@@ -30,11 +30,11 @@ class Application(models.Model):
 
     # SUPPORT DETAILS
     support_type = models.CharField(max_length=20, choices=ConstLists().support_types, default=SupportType.AID.value)
-    type_of_church_project = models.CharField(max_length=50, choices=ConstLists().church_project_types)
+    type_of_church_project = models.CharField(max_length=50, choices=ConstLists().church_project_types, null=True, blank=True)
     amount = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     amount_in_words = models.CharField(max_length=500, default='')
     estimated_project_cost = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
-    project_location = models.CharField(max_length=500)
+    project_location = models.CharField(max_length=500, default='')
     purpose = models.TextField(null=True, blank=True)
     phase = models.CharField(max_length=100, default='')
     description = models.TextField(null=True, blank=True) 
