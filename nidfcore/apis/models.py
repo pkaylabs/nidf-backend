@@ -39,6 +39,8 @@ class Application(models.Model):
     phase = models.CharField(max_length=100, default='')
     description = models.TextField(null=True, blank=True) 
     status = models.CharField(max_length=20, default=ApplicationStatus.DRAFT.value)
+    expected_completion_date = models.DateField(null=True, blank=True)
+    is_emergency = models.BooleanField(default=False)
 
     # documents
     current_stage = models.FileField(upload_to='applications/current_stage/', null=True, blank=True)
