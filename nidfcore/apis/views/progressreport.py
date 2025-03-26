@@ -51,6 +51,25 @@ class ProgressReportsAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+    def delete(self, request, *args, **kwargs):
+        '''Delete a progress report'''
+        user = request.user
+        report_id = request.data.get('report')
+        if not report_id:
+            return Response({"message": "Report ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        # only the church user can delete a progress report
+        if user.user_type == UserType.CHURCH_USER.value:
+            report = ProgressReport.objects.filter(report_id=report_id, application__church=user.church_profile).first()
+            if report:
+                # can only delete a pending progress report
+                if report.status != ApplicationStatus.PENDING.value:
+                    return Response({"message": "You can only delete a pending progress report"}, status=status.HTTP_403_FORBIDDEN)
+                report.delete()
+                return Response({"message": "Progress Report Deleted Successfully"}, status=status.HTTP_200_OK)
+            return Response({"message": "Progress Report not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "You are not allowed to delete a progress report"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+
 class VerifyProgressReportAPIView(APIView):
     '''Endpoint to verify progress reports'''
 
