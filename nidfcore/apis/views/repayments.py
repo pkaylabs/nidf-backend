@@ -47,6 +47,23 @@ class RepaymensAPIView(APIView):
             return Response(GetRepaymentSerializer(repayment).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    
+    def delete(self, request, *args, **kwargs):
+        '''Delete a repayment'''
+        user = request.user
+        repayment_id = request.data.get('repayment')
+        if not repayment_id:
+            return Response({"message": "Repayment ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if user.user_type == UserType.FINANCE_OFFICER.value:
+            repayment = Repayment.objects.filter(repayment_id=repayment_id).first()
+            if repayment:
+                if repayment.status == ApplicationStatus.PENDING.value:
+                    repayment.delete()
+                    return Response({"message": "Repayment deleted successfully"}, status=status.HTTP_200_OK)
+                return Response({"message": "Processed Repayment cannot be deleted"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "Repayment record not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "You are not allowed to delete a repayment"}, status=status.HTTP_403_FORBIDDEN)
+            
 
 class VerifyRepaymentAPIView(APIView):
     '''Endpoint to verify repayments'''
