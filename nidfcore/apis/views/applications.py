@@ -89,6 +89,27 @@ class ApplicationsAPIView(APIView):
             application.updated_by = user
             application.save()
             return Response({"message": "Application Submitted Successfully"}, status=status.HTTP_200_OK)
+        
+
+    def delete(self, request, *args, **kwargs):
+        '''delete an application'''
+        user = request.user
+        applicationid = request.data.get('application')
+
+        if user.is_superuser or user.user_type == UserType.ADMIN.value or user.user_type == UserType.FINANCE_OFFICER.value:
+            # admins can delete any application
+            application = Application.objects.filter(application_id=applicationid).first()
+        else:
+            # church users can only delete applications belonging to their church
+            application = Application.objects.filter(church=user.church_profile, application_id=applicationid).first()
+
+        if application == None:
+            return Response({"message": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
+        if application.status != ApplicationStatus.DRAFT.value:
+            return Response({"message": "Cannot delete a submitted application"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            application.delete()
+            return Response({"message": "Application Deleted Successfully"}, status=status.HTTP_200_OK)
 
 
 
