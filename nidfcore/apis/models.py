@@ -86,7 +86,8 @@ class Repayment(models.Model):
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='creator')
+    updated_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='updator')
 
     def __str__(self):
         return f"{self.repayment_id} - {self.amount}"

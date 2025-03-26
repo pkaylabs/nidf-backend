@@ -47,6 +47,25 @@ class RepaymensAPIView(APIView):
             return Response(GetRepaymentSerializer(repayment).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    def put(self, request, *args, **kwargs):
+        '''update a repayment: can only update an unprocessed repayment'''
+        user = request.user
+        repayment_id = request.data.get('repayment')
+        if not repayment_id:
+            return Response({"message": "Repayment ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        # only the church user can update a repayment
+        if user.user_type == UserType.CHURCH_USER.value:
+            repayment = Repayment.objects.filter(repayment_id=repayment_id, application__church=user.church_profile).first()
+            if repayment:
+                if repayment.status == ApplicationStatus.PENDING.value:
+                    serializer = AddRepaymentSerializer(repayment, data=request.data, partial=True)
+                    if serializer.is_valid():
+                        repayment = serializer.save(updated_by=user)
+                        return Response(GetRepaymentSerializer(repayment).data, status=status.HTTP_200_OK)
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Processed Repayment cannot be updated"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "Repayment record not found"}, status=status.HTTP_404_NOT_FOUND)
+    
     
     def delete(self, request, *args, **kwargs):
         '''Delete a repayment'''
