@@ -54,8 +54,12 @@ class RepaymensAPIView(APIView):
         repayment_id = request.data.get('repayment')
         if not repayment_id:
             return Response({"message": "Repayment ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        if user.user_type == UserType.FINANCE_OFFICER.value:
-            repayment = Repayment.objects.filter(repayment_id=repayment_id).first()
+        # only the finance officer and church user can delete a repayment
+        if user.user_type == UserType.FINANCE_OFFICER.value or user.user_type == UserType.CHURCH_USER.value:
+            if user.user_type == UserType.CHURCH_USER.value:
+                repayment = Repayment.objects.filter(repayment_id=repayment_id, application__church=user.church_profile).first()
+            else:
+                repayment = Repayment.objects.filter(repayment_id=repayment_id).first()
             if repayment:
                 if repayment.status == ApplicationStatus.PENDING.value:
                     repayment.delete()
