@@ -47,6 +47,7 @@ class RepaymensAPIView(APIView):
             return Response(GetRepaymentSerializer(repayment).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    
     def put(self, request, *args, **kwargs):
         '''update a repayment: can only update an unprocessed repayment'''
         user = request.user
@@ -65,6 +66,9 @@ class RepaymensAPIView(APIView):
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 return Response({"message": "Processed Repayment cannot be updated"}, status=status.HTTP_403_FORBIDDEN)
             return Response({"message": "Repayment record not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"message": "You are not allowed to update repayment"}, status=status.HTTP_403_FORBIDDEN)
+
     
     
     def delete(self, request, *args, **kwargs):
