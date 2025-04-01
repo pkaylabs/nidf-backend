@@ -61,10 +61,38 @@ class AddApplicationSerializers(serializers.ModelSerializer):
         model = Application
         fields = "__all__"
 
-        
+class RegionSerializer(serializers.ModelSerializer):
+    '''Serializer for regions'''
+class Meta:
+    model = Region
+    fields = "__all__"
+
+
+class GetDistrictSerializer(serializers.ModelSerializer):
+    '''Serializer for districts'''
+    region = RegionSerializer()
+    class Meta:
+        model = District
+        fields = "__all__"
+
+class AddChurchSerializer(serializers.ModelSerializer):
+    '''Serializer for adding churches'''
+    district = serializers.PrimaryKeyRelatedField(queryset=District.objects.all())
+    class Meta:
+        model = Church
+        fields = "__all__"
+
+class GetChurchSerializer(serializers.ModelSerializer):
+    '''Serializer for getting churches'''
+    district = GetDistrictSerializer()
+    class Meta:
+        model = Church
+        fields = "__all__"
+
+
 class ApplicationSerializers(serializers.ModelSerializer):
     '''Serializer for applications'''
-    church = serializers.PrimaryKeyRelatedField(queryset=Church.objects.all())
+    church = GetChurchSerializer()
     class Meta:
         model = Application
         fields = "__all__"
@@ -110,7 +138,6 @@ class GetDisbursementSerializer(serializers.ModelSerializer):
         model = Disbursement
         fields = "__all__"
 
-
 class AddDistrictSerializer(serializers.ModelSerializer):
     '''Serializer for districts'''
     region = serializers.PrimaryKeyRelatedField(queryset=Region.objects.all())
@@ -118,31 +145,4 @@ class AddDistrictSerializer(serializers.ModelSerializer):
         model = District
         fields = "__all__"
 
-class RegionSerializer(serializers.ModelSerializer):
-    '''Serializer for regions'''
-    class Meta:
-        model = Region
-        fields = "__all__"
-
-
-class GetDistrictSerializer(serializers.ModelSerializer):
-    '''Serializer for districts'''
-    region = RegionSerializer()
-    class Meta:
-        model = District
-        fields = "__all__"
-
-class AddChurchSerializer(serializers.ModelSerializer):
-    '''Serializer for adding churches'''
-    district = serializers.PrimaryKeyRelatedField(queryset=District.objects.all())
-    class Meta:
-        model = Church
-        fields = "__all__"
-
-class GetChurchSerializer(serializers.ModelSerializer):
-    '''Serializer for getting churches'''
-    district = GetDistrictSerializer()
-    class Meta:
-        model = Church
-        fields = "__all__"
 
