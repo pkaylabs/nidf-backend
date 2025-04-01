@@ -63,9 +63,9 @@ class AddApplicationSerializers(serializers.ModelSerializer):
 
 class RegionSerializer(serializers.ModelSerializer):
     '''Serializer for regions'''
-class Meta:
-    model = Region
-    fields = "__all__"
+    class Meta:
+        model = Region
+        fields = "__all__"
 
 
 class GetDistrictSerializer(serializers.ModelSerializer):
