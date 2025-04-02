@@ -24,6 +24,8 @@ class DashboardAPIView(APIView):
             }, status=status.HTTP_200_OK)
         elif user.user_type == UserType.CHURCH_USER.value and user.church_profile != None:
             church = user.church_profile
+            pending = Application.objects.filter(church=user.church_profile).order_by('-created_by').first()
+            msg = f"Your Application ({pending.application_id} is pending review.)" if pending is not None else "You have no application pending review."
             return Response({
                 'amount_received': church.get_amount_received(),
                 'amount_repaid': church.get_amount_repaid(),
@@ -31,6 +33,7 @@ class DashboardAPIView(APIView):
                 'last_payment': church.get_last_repayment_date(),
                 'repayment_percentage': church.get_repaid_percentage(),
                 'next_due_date': church.get_next_due_date(),
+                'pending_application': msg
             }, status=status.HTTP_200_OK)
         else:
             return Response({"message": "User does not have a church profile"}, status=status.HTTP_400_BAD_REQUEST)
