@@ -24,7 +24,8 @@ class DashboardAPIView(APIView):
             }, status=status.HTTP_200_OK)
         elif user.user_type == UserType.CHURCH_USER.value and user.church_profile != None:
             church = user.church_profile
-            pending = Application.objects.filter(church=user.church_profile).order_by('-created_by').first()
+            pending_statuses = [ApplicationStatus.PENDING.value, ApplicationStatus.UNDER_REVIEW.value, ApplicationStatus.WAITING_NO_APPROVAL.value]
+            pending = Application.objects.filter(church=user.church_profile, status__in=pending_statuses).order_by('-created_by').first()
             msg = f"Your Application ({pending.application_id}) is pending review." if pending is not None else "You have no application pending review."
             return Response({
                 'amount_received': church.get_amount_received(),
