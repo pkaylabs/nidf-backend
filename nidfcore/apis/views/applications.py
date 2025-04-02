@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 
 from apis.models import Application
 from apis.serializers import AddApplicationSerializers, ApplicationSerializers
-from nidfcore.utils.constants import ApplicationStatus, UserType
+from nidfcore.utils.constants import ApplicationStatus, ConstLists, UserType
 from nidfcore.utils.permissions import IsCentralAndSuperUser
 from nidfcore.utils.services import send_sms
 
@@ -135,13 +135,8 @@ class ProcessApplicationsAPIView(APIView):
                 return Response({"message": "Application not found"},  status=status.HTTP_404_NOT_FOUND)
             
             # the only allowed statuses at the moment are 'APPROVED' and 'REJECTED'
-            if application_status.upper() == ApplicationStatus.APPROVED.value:
-                application.status = ApplicationStatus.APPROVED.value
-                application.updated_by = user
-                application.save()
-                return Response({"message": "Application Status Changed"},  status=status.HTTP_200_OK)
-            elif application_status.upper() == ApplicationStatus.REJECTED.value:
-                application.status = ApplicationStatus.REJECTED.value
+            if application_status.upper() in ConstLists.application_statuses:
+                application.status = application_status.upper()
                 application.updated_by = user
                 application.save()
                 return Response({"message": "Application Status Changed"},  status=status.HTTP_200_OK)
