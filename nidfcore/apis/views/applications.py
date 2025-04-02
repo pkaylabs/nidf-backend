@@ -134,8 +134,8 @@ class ProcessApplicationsAPIView(APIView):
             if application == None:
                 return Response({"message": "Application not found"},  status=status.HTTP_404_NOT_FOUND)
             
-            # the only allowed statuses at the moment are 'APPROVED' and 'REJECTED'
-            if application_status.upper() in ConstLists.application_statuses:
+            application_statuses = [i[0] for i in ConstLists.application_statuses]
+            if application_status.strip().upper() in application_statuses:
                 application.status = application_status.upper()
                 application.updated_by = user
                 application.save()
