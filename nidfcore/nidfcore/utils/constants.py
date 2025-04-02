@@ -21,9 +21,8 @@ class ApplicationStatus(Enum):
     PENDING = 'PENDING REVIEW'
     APPROVED = 'APPROVED'
     REJECTED = 'REJECTED'
-    VERIFIED = 'VERIFIED'
-    DELETED = 'DELETED'
-
+    UNDER_REVIEW = 'UNDER REVIEW'
+    WAITING_NO_APPROVAL = "WAITING NO'S APPROVAL"
 
 class NotificationChannel(Enum):
     '''Defines the notification channels allowed in the system'''
@@ -73,5 +72,9 @@ class ConstLists:
         ('GROUP OF DISTRICTS HEADQUARTERS CHURCH', 'GROUP OF DISTRICTS HEADQUARTERS CHURCH'),
         ('DISTRICT CHURCH', 'DISTRICT CHURCH'),
         ('LOCATION CHURCH', 'LOCATION CHURCH'),
+    ]
+
+    application_statuses = [
+        (app.value, app.value) for app in ApplicationStatus
     ]
 

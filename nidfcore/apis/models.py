@@ -38,7 +38,7 @@ class Application(models.Model):
     purpose = models.TextField(null=True, blank=True)
     phase = models.CharField(max_length=100, default='')
     description = models.TextField(null=True, blank=True) 
-    status = models.CharField(max_length=20, default=ApplicationStatus.DRAFT.value)
+    status = models.CharField(max_length=25, default=ApplicationStatus.DRAFT.value, choices=ConstLists.application_statuses)
     expected_completion_date = models.DateField(null=True, blank=True)
     is_emergency = models.BooleanField(default=False)
 
