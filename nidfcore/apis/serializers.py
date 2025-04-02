@@ -97,6 +97,13 @@ class ApplicationSerializers(serializers.ModelSerializer):
         model = Application
         fields = "__all__"
         
+
+class AddApplicationSerializers(serializers.ModelSerializer):
+    '''Serializer for applications'''
+    class Meta:
+        model = Application
+        fields = "__all__"
+        
 class AddRepaymentSerializer(serializers.ModelSerializer):
     '''Serializer for repayments'''
     class Meta:

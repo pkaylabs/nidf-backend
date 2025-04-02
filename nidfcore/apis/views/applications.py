@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apis.models import Application
-from apis.serializers import ApplicationSerializers
+from apis.serializers import AddApplicationSerializers, ApplicationSerializers
 from nidfcore.utils.constants import ApplicationStatus, UserType
 from nidfcore.utils.permissions import IsCentralAndSuperUser
 from nidfcore.utils.services import send_sms
@@ -43,7 +43,7 @@ class ApplicationsAPIView(APIView):
             print('Application exists already...')
             # application exists: update the application
             application = Application.objects.get(application_id=application_id)
-            serializer = ApplicationSerializers(application, data=request.data)
+            serializer = AddApplicationSerializers(application, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(updated_by=user)
             return Response(
@@ -56,7 +56,7 @@ class ApplicationsAPIView(APIView):
 
         # Create a new application
         print('Creating a new application...')
-        serializer = ApplicationSerializers(data=request.data)
+        serializer = AddApplicationSerializers(data=request.data)
 
         if serializer.is_valid():
             church = serializer.validated_data.get('church') or user.church_profile
@@ -110,7 +110,6 @@ class ApplicationsAPIView(APIView):
         else:
             application.delete()
             return Response({"message": "Application Deleted Successfully"}, status=status.HTTP_200_OK)
-
 
 
 class ProcessApplicationsAPIView(APIView):
