@@ -24,6 +24,15 @@ class ApplicationStatus(Enum):
     UNDER_REVIEW = 'UNDER REVIEW'
     WAITING_NO_APPROVAL = "WAITING NO'S APPROVAL"
 
+
+class ReportStatus(Enum):
+    '''Defines the report statuses allowed in the system'''
+    PENDING = 'PENDING'
+    VERIFIED = 'VERIFIED'
+    REJECTED = 'REJECTED'
+
+
+
 class NotificationChannel(Enum):
     '''Defines the notification channels allowed in the system'''
     EMAIL = 'EMAIL'
@@ -76,5 +85,9 @@ class ConstLists:
 
     application_statuses = [
         (app.value, app.value) for app in ApplicationStatus
+    ]
+
+    report_statuses = [
+        (rep.value, rep.value) for rep in ReportStatus
     ]
 

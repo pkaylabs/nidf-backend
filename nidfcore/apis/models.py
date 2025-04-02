@@ -6,7 +6,7 @@ from django.db import models
 
 from accounts.models import Church, District, Region, User
 from nidfcore.utils.constants import (ApplicationStatus, ConstLists, Frequency,
-                                      NotificationChannel, SupportType, Target)
+                                      NotificationChannel, ReportStatus, SupportType, Target)
 from nidfcore.utils.services import send_sms
 
 
@@ -103,7 +103,7 @@ class ProgressReport(models.Model):
     application = models.ForeignKey(Application, on_delete=models.PROTECT)
     progress_description = models.TextField()
     proof_of_progress = models.FileField(upload_to='progress/')
-    status = models.CharField(max_length=15, default=ApplicationStatus.PENDING.value)
+    status = models.CharField(max_length=15, default=ReportStatus.PENDING.value, choices=ConstLists.report_statuses)
     activity_completed = models.BooleanField(default=False)
 
     # stamps

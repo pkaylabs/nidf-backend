@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from apis.models import ProgressReport
 from apis.serializers import (AddProgressReportSerializer,
                               GetProgressReportSerializer)
-from nidfcore.utils.constants import ApplicationStatus, UserType
+from nidfcore.utils.constants import ReportStatus, UserType
 from nidfcore.utils.permissions import IsCentralAndSuperUser
 
 
@@ -62,7 +62,7 @@ class ProgressReportsAPIView(APIView):
             report = ProgressReport.objects.filter(report_id=report_id, application__church=user.church_profile).first()
             if report:
                 # can only delete a pending progress report
-                if report.status != ApplicationStatus.PENDING.value:
+                if report.status != ReportStatus.PENDING.value:
                     return Response({"message": "You can only delete a pending progress report"}, status=status.HTTP_403_FORBIDDEN)
                 report.delete()
                 return Response({"message": "Progress Report Deleted Successfully"}, status=status.HTTP_200_OK)
@@ -89,7 +89,7 @@ class VerifyProgressReportAPIView(APIView):
             return Response({"message": "Report not found"}, status=status.HTTP_404_NOT_FOUND)
         
         # change the status to verified
-        report.status = ApplicationStatus.VERIFIED.value
+        report.status = ReportStatus.VERIFIED.value
         report.updated_by = user
         report.save()
 
