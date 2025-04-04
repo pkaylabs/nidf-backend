@@ -6,6 +6,7 @@ from .divisions import *
 from .progressreport import *
 from .repayments import *
 from .users import *
+from .notifications import *
 
 
 class PingAPI(APIView):
