@@ -54,4 +54,6 @@ urlpatterns += [
 # notifications endpoints
 urlpatterns += [
     path('notifications/', views.NotificationsAPIView.as_view(), name='notifications'),
+    # broadcast scheduled notifications
+    path('broadcastsn/', views.ScheduledNotificationBroadcastAPIView.as_view(), name='bsn'),
 ]
