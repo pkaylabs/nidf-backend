@@ -35,16 +35,34 @@ class RegionsAPIView(APIView):
         name = request.data.get('name')
         region = Region.objects.filter(name=name).first()
 
-        serializer = RegionSerializer(region, data=request.data)
+        if region is not None:
+            return Response({"message": "Region with this name already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = RegionSerializer(data=request.data)
 
         if user.user_type == UserType.CHURCH_USER.value:
             return Response({"message": "You are not allowed to create regions"}, status=status.HTTP_401_UNAUTHORIZED)
 
         if serializer.is_valid():
             serializer.save(created_by=user)
-            if region is None:
-                return Response({"message": "Region created successfully"}, status=status.HTTP_201_CREATED)
-            return Response({"message": "Region Updated successfully"}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Region created successfully"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    
+    def put(self, request, *args, **kwargs):
+        # only admin users can update regions
+        user = request.user
+        if not (user.user_type == UserType.ADMIN.value or user.is_superuser or user.is_staff ):
+            return Response({"message": "You are not allowed to update regions"}, status=status.HTTP_401_UNAUTHORIZED)
+        region_id = request.data.get('region')
+        region = Region.objects.filter(id=region_id).first()
+        if region is None:
+            return Response({"message": "Region not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = RegionSerializer(region, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Region updated successfully"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
@@ -91,16 +109,33 @@ class DivisionsAPIView(APIView):
         name = request.data.get('name')
         district = District.objects.filter(name=name).first()
 
-        serializer = AddDistrictSerializer(district, data=request.data)
+        if district is not None:
+            return Response({"message": "Division with this name already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
         if user.user_type == UserType.CHURCH_USER.value:
             return Response({"message": "You are not allowed to create division"}, status=status.HTTP_401_UNAUTHORIZED)
 
+        serializer = AddDistrictSerializer(data=request.data)
+
         if serializer.is_valid():
             serializer.save()
-            if district is None:
-                return Response({"message": "Division created successfully"}, status=status.HTTP_201_CREATED)
-            return Response({"message": "Division Upudated successfully"}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Division created successfully"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self, request, *args, **kwargs):
+        # only admin users can update divisions
+        user = request.user
+        if not (user.user_type == UserType.ADMIN.value or user.is_superuser or user.is_staff ):
+            return Response({"message": "You are not allowed to update division"}, status=status.HTTP_401_UNAUTHORIZED)
+        division_id = request.data.get('division')
+        division = District.objects.filter(id=division_id).first()
+        if division is None:
+            return Response({"message": "Division not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = AddDistrictSerializer(division, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Division updated successfully"}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
