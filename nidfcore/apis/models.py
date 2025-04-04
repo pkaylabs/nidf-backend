@@ -235,46 +235,7 @@ class Notification(models.Model):
                 )
 
         return False
-    # def can_broadcast(self) -> bool:
-    #     '''Checks if the notification can be broadcasted'''
-    #     if not self.is_scheduled:
-    #         return False
-
-    #     if self.schedule_start_date and self.schedule_start_end:
-    #         now = timezone.now()
-
-    #         # Check if the current time is within the start and end range
-    #         if not (self.schedule_start_date <= now <= self.schedule_start_end):
-    #             return False
-
-    #         # Calculate if the current datetime matches the exact frequency
-    #         if self.schedule_frequency == Frequency.DAILY.value:
-    #             # Check if the time matches the start date's time
-    #             return now.time() == self.schedule_start_date.time()
-
-    #         elif self.schedule_frequency == Frequency.WEEKLY.value:
-    #             # Check if the day of the week and time match
-    #             return (
-    #                 now.weekday() == self.schedule_start_date.weekday() and
-    #                 now.time() == self.schedule_start_date.time()
-    #             )
-
-    #         elif self.schedule_frequency == Frequency.FORTNIGHTLY.value:
-    #             # Check if the current date is exactly 14 days apart from the start date
-    #             delta_days = (now.date() - self.schedule_start_date.date()).days
-    #             return (
-    #                 delta_days % 14 == 0 and
-    #                 now.time() == self.schedule_start_date.time()
-    #             )
-
-    #         elif self.schedule_frequency == Frequency.MONTHLY.value:
-    #             # Check if the day of the month and time match
-    #             return (
-    #                 now.day == self.schedule_start_date.day and
-    #                 now.time() == self.schedule_start_date.time()
-    #             )
-            
-    #     return False
+    
     
     def broadcast(self, user: User = None, channel: str = NotificationChannel.SMS.value):
         '''Broadcasts the notification to a user'''
