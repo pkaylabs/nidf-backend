@@ -53,7 +53,6 @@ class Target(Enum):
     REGION = 'REGION'
     ALL = 'ALL'
 
-
 class ChurchType(Enum):
     '''Defines the types of churches in the system'''
     REGIONAL = 'REGIONAL'
@@ -89,5 +88,9 @@ class ConstLists:
 
     report_statuses = [
         (rep.value, rep.value) for rep in ReportStatus
+    ]
+
+    notification_targets = [
+        (nt.value, nt.value) for nt in Target
     ]
 
