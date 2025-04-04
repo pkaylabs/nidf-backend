@@ -1,6 +1,7 @@
 import random
 import string
-from datetime import timezone
+from django.utils import timezone
+from datetime import timedelta
 
 from django.db import models
 
@@ -189,8 +190,93 @@ class Notification(models.Model):
     broadcasted_at = models.DateTimeField(null=True, blank=True)
     broadcasted_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='created_by')
+
+    def can_broadcast(self) -> bool:
+        '''Checks if the notification can be broadcasted'''
+        if not self.is_scheduled:
+            return False
+
+        if self.schedule_start_date and self.schedule_start_end:
+            now = timezone.now()
+
+            # Normalize the time to only include hour and minute
+            now_time = now.replace(second=0, microsecond=0)
+            start_time = self.schedule_start_date.replace(second=0, microsecond=0)
+
+            # Check if the current time is within the start and end range
+            if not (self.schedule_start_date <= now <= self.schedule_start_end):
+                return False
+
+            # Calculate if the current datetime matches the exact frequency
+            if self.schedule_frequency == Frequency.DAILY.value:
+                # Check if the time matches the start date's time
+                return now_time.time() == start_time.time()
+
+            elif self.schedule_frequency == Frequency.WEEKLY.value:
+                # Check if the day of the week and time match
+                return (
+                    now.weekday() == self.schedule_start_date.weekday() and
+                    now_time.time() == start_time.time()
+                )
+
+            elif self.schedule_frequency == Frequency.FORTNIGHTLY.value:
+                # Check if the current date is exactly 14 days apart from the start date
+                delta_days = (now.date() - self.schedule_start_date.date()).days
+                return (
+                    delta_days % 14 == 0 and
+                    now_time.time() == start_time.time()
+                )
+
+            elif self.schedule_frequency == Frequency.MONTHLY.value:
+                # Check if the day of the month and time match
+                return (
+                    now.day == self.schedule_start_date.day and
+                    now_time.time() == start_time.time()
+                )
+
+        return False
+    # def can_broadcast(self) -> bool:
+    #     '''Checks if the notification can be broadcasted'''
+    #     if not self.is_scheduled:
+    #         return False
+
+    #     if self.schedule_start_date and self.schedule_start_end:
+    #         now = timezone.now()
+
+    #         # Check if the current time is within the start and end range
+    #         if not (self.schedule_start_date <= now <= self.schedule_start_end):
+    #             return False
+
+    #         # Calculate if the current datetime matches the exact frequency
+    #         if self.schedule_frequency == Frequency.DAILY.value:
+    #             # Check if the time matches the start date's time
+    #             return now.time() == self.schedule_start_date.time()
+
+    #         elif self.schedule_frequency == Frequency.WEEKLY.value:
+    #             # Check if the day of the week and time match
+    #             return (
+    #                 now.weekday() == self.schedule_start_date.weekday() and
+    #                 now.time() == self.schedule_start_date.time()
+    #             )
+
+    #         elif self.schedule_frequency == Frequency.FORTNIGHTLY.value:
+    #             # Check if the current date is exactly 14 days apart from the start date
+    #             delta_days = (now.date() - self.schedule_start_date.date()).days
+    #             return (
+    #                 delta_days % 14 == 0 and
+    #                 now.time() == self.schedule_start_date.time()
+    #             )
+
+    #         elif self.schedule_frequency == Frequency.MONTHLY.value:
+    #             # Check if the day of the month and time match
+    #             return (
+    #                 now.day == self.schedule_start_date.day and
+    #                 now.time() == self.schedule_start_date.time()
+    #             )
+            
+    #     return False
     
-    def broadcast(self, user: User, channel: str = NotificationChannel.SMS.value):
+    def broadcast(self, user: User = None, channel: str = NotificationChannel.SMS.value):
         '''Broadcasts the notification to a user'''
         if self.target == Target.ALL.value:
             # get all the phones for the users
@@ -209,6 +295,8 @@ class Notification(models.Model):
             phones = [u.phone for u in districts].extend([u.overseer_phone for u in districts])
         else:
             # get the phone for the user
+            if not user:
+                return
             phones = [user.phone]
 
         # send the notification to the phones
@@ -218,6 +306,8 @@ class Notification(models.Model):
         self.broadcasted_by = user
         self.broadcasted_at = timezone.now()
         self.save()
+
+        return True
 
     def __str__(self):
         return self.title
