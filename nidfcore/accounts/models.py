@@ -207,5 +207,16 @@ class District(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def churches(self) -> int:
+        '''Returns the churches in the district'''
+        churches = Church.objects.filter(district=self).count()
+        return churches
+    
+    @property
+    def regions(self) -> int:
+        '''Returns the regions in the district'''
+        return 1 # since a district can only belong to one region
+
     def __str__(self):
         return self.name
