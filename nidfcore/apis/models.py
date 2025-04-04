@@ -62,6 +62,12 @@ class Application(models.Model):
     def get_repayment_amount(self) -> float:
         '''Returns the total amount repaid for the application'''
         return sum([rep.amount for rep in self.repayment_set.all()])
+    
+    def notify_applicant(self, started=False, approved=False, rejected=False):
+        '''Notify the applicant that the application is received|approved|rejected'''
+        msg = f"Greetings from the NIDF Team.\n\nWe just realized you started an application. Your application ID is {self.application_id}. Please note that you have to provide all the required information in order to be considered. Thank you.\n\nThe NIDF Team."
+        phone = self.church.pastor_phone
+        send_sms(msg, [phone])
 
     def __str__(self):
         return self.application_id
@@ -141,6 +147,10 @@ class Disbursement(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+
+    def notify_applicant_church(self):
+        '''notify the church that disbursement has been made'''
+        pass
 
     def __str__(self):
         return f"{self.disbursement_id} - {self.amount}"
