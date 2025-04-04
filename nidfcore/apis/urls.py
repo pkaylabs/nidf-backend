@@ -50,3 +50,8 @@ urlpatterns += [
     path('regions/', views.RegionsAPIView.as_view(), name='regions'),
     path('divisions/', views.DivisionsAPIView.as_view(), name='districts'),
 ]
+
+# notifications endpoints
+urlpatterns += [
+    path('notifications/', views.NotificationsAPIView.as_view(), name='notifications'),
+]
