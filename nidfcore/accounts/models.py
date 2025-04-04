@@ -177,7 +177,7 @@ class Region(models.Model):
     
     @property
     def created_by_user(self) -> str:
-        '''Returns the user that created the region'''
+        '''Returns the name of the user that created the region'''
         if self.created_by:
             return self.created_by.name
         return "Admin User"
