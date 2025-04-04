@@ -74,6 +74,8 @@ class RegionSerializer(serializers.ModelSerializer):
 class GetDistrictSerializer(serializers.ModelSerializer):
     '''Serializer for districts'''
     region = RegionSerializer()
+    regions = serializers.ReadOnlyField()
+    churches = serializers.ReadOnlyField()
     class Meta:
         model = District
         fields = "__all__"
