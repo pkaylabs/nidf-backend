@@ -5,7 +5,7 @@ from datetime import timezone
 from django.db import models
 
 from accounts.models import Church, District, Region, User
-from nidfcore.utils.constants import (ApplicationStatus, ConstLists, Frequency,
+from nidfcore.utils.constants import (ApplicationStatus, ConstLists as CL, Frequency,
                                       NotificationChannel, ReportStatus, SupportType, Target)
 from nidfcore.utils.services import send_sms
 
@@ -29,8 +29,8 @@ class Application(models.Model):
     available_funds_for_project = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
 
     # SUPPORT DETAILS
-    support_type = models.CharField(max_length=20, choices=ConstLists().support_types, default=SupportType.AID.value)
-    type_of_church_project = models.CharField(max_length=50, choices=ConstLists().church_project_types, null=True, blank=True)
+    support_type = models.CharField(max_length=20, choices=CL().support_types, default=SupportType.AID.value)
+    type_of_church_project = models.CharField(max_length=50, choices=CL().church_project_types, null=True, blank=True)
     amount = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     amount_in_words = models.CharField(max_length=500, default='')
     estimated_project_cost = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
@@ -38,7 +38,7 @@ class Application(models.Model):
     purpose = models.TextField(null=True, blank=True)
     phase = models.CharField(max_length=100, default='')
     description = models.TextField(null=True, blank=True) 
-    status = models.CharField(max_length=25, default=ApplicationStatus.DRAFT.value, choices=ConstLists.application_statuses)
+    status = models.CharField(max_length=25, default=ApplicationStatus.DRAFT.value, choices=CL.application_statuses)
     expected_completion_date = models.DateField(null=True, blank=True)
     is_emergency = models.BooleanField(default=False)
 
@@ -124,7 +124,7 @@ class ProgressReport(models.Model):
     application = models.ForeignKey(Application, on_delete=models.PROTECT)
     progress_description = models.TextField()
     proof_of_progress = models.FileField(upload_to='progress/')
-    status = models.CharField(max_length=15, default=ReportStatus.PENDING.value, choices=ConstLists.report_statuses)
+    status = models.CharField(max_length=15, default=ReportStatus.PENDING.value, choices=CL.report_statuses)
     activity_completed = models.BooleanField(default=False)
 
     # stamps
@@ -181,7 +181,8 @@ class Notification(models.Model):
     schedule_start_date = models.DateTimeField(null=True, blank=True)
     schedule_start_end = models.DateTimeField(null=True, blank=True)
     schedule_frequency = models.CharField(max_length=20, default=Frequency.WEEKLY.value)
-
+    target = models.CharField(max_length=20, choices=CL().notification_targets, default=Target.ALL.value)
+    attachment = models.FileField(upload_to='notifications/', null=True, blank=True)
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -189,31 +190,34 @@ class Notification(models.Model):
     broadcasted_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='created_by')
     
-    def broadcast(self, user: User, target: str, channel: str = NotificationChannel.SMS.value):
+    def broadcast(self, user: User, channel: str = NotificationChannel.SMS.value):
         '''Broadcasts the notification to a user'''
-        if target == Target.ALL.value:
+        if self.target == Target.ALL.value:
             # get all the phones for the users
             phones = [u.phone for u in User.objects.all()]
-        elif target == Target.CHURCH.value:
+        elif self.target == Target.CHURCH.value:
             # get all the phones for the church and the pastor
-            phones = [u.pastor_phone for u in Church.objects.all()].extend([u.church_phone for u in Church.objects.all()])
-        elif target == Target.REGION.value:
+            churches = Church.objects.all()
+            phones = [u.pastor_phone for u in churches].extend([u.church_phone for u in churches])
+        elif self.target == Target.REGION.value:
             # get all the phones for the region and the overseer
-            phones = [u.phone for u in Region.objects.all()].extend([u.overseer_phone for u in Region.objects.all()])
-        elif target == Target.DISTRICT.value:
+            regions = Region.objects.all()
+            phones = [u.phone for u in regions].extend([u.overseer_phone for u in regions])
+        elif self.target == Target.DISTRICT.value:
             # get all the phones for the district and the overseer
-            phones = [u.phone for u in District.objects.all()].extend([u.overseer_phone for u in District.objects.all()])
+            districts = District.objects.all()
+            phones = [u.phone for u in districts].extend([u.overseer_phone for u in districts])
         else:
             # get the phone for the user
             phones = [user.phone]
 
         # send the notification to the phones
-        send_sms(recipients=phones, message=self.message)
+        msg = f"{self.title}\n\n{self.message}"
+        send_sms(recipients=phones, message=msg)
 
         self.broadcasted_by = user
         self.broadcasted_at = timezone.now()
         self.save()
-
 
     def __str__(self):
         return self.title
