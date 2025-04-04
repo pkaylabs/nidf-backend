@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 
 from accounts.models import Church, District, Region, User
-from apis.models import Application, Disbursement, ProgressReport, Repayment
+from apis.models import Application, Disbursement, Notification, ProgressReport, Repayment
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -158,3 +158,8 @@ class AddDistrictSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class NotificationSerializer(serializers.ModelSerializer):
+    '''Serializer for notifications'''
+    class Meta:
+        model = Notification
+        fields = "__all__"
