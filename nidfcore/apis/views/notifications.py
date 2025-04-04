@@ -2,6 +2,7 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
+from django.utils import timezone
 
 from apis.models import Notification
 from apis.serializers import NotificationSerializer
@@ -43,10 +44,16 @@ class NotificationsAPIView(APIView):
         serializer = NotificationSerializer(notification, data=request.data, partial=True)
         if serializer.is_valid():
             if notification:
-                serializer.save(updated_by=user)
+                notif = serializer.save(updated_by=user)
+                # Send notification to the targeted users if the notification is not scheduled
+                if not notif.is_scheduled:
+                    notif.broadcast(user=user)
                 return Response({"message": "Notification Updated Successfully" ,"data":serializer.data}, status=status.HTTP_200_OK)
             else:
-                serializer.save(created_by=user)
+                notif = serializer.save(created_by=user)
+                # Send notification to the targeted users if the notification is not scheduled
+                if not notif.is_scheduled:
+                    notif.broadcast(user=user)
             return Response({"message": "Notification Created Successfully" ,"data":serializer.data}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -62,3 +69,20 @@ class NotificationsAPIView(APIView):
             return Response({"message": "Notification deleted successfully"}, status=status.HTTP_200_OK)
         except Notification.DoesNotExist:
             return Response({"message": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class ScheduledNotificationBroadcastAPIView(APIView):
+    '''handles the scheduled notifications'''
+    permission_classes = [permissions.AllowAny]
+    def get(self, request):
+        # get notifications that are scheduled to be sent today
+        notifications = Notification.objects.filter(is_scheduled=True)
+        for notification in notifications:
+            if not notification.can_broadcast():
+                print(f"Skipping notification {notification.id} as it is not ready to be broadcasted")
+                continue
+            # send the notification to the targeted users
+            print(f"Broadcasting notification {notification.id} to {notification.target} users")
+            notification.broadcast(user=None)
+            print("============================================")
+        return Response({"message": "Request Submitted Successfully"}, status=status.HTTP_200_OK)
