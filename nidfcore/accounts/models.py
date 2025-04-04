@@ -161,6 +161,7 @@ class Region(models.Model):
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     @property
     def districts(self) -> int:
@@ -173,6 +174,13 @@ class Region(models.Model):
         '''Returns the churches in the region'''
         churches = Church.objects.filter(district__region=self).count()
         return churches
+    
+    @property
+    def created_by_user(self) -> str:
+        '''Returns the user that created the region'''
+        if self.created_by:
+            return self.created_by.name
+        return "Admin User"
 
     def __str__(self):
         return self.name

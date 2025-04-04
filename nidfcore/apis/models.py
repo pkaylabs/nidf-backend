@@ -165,7 +165,6 @@ class Disbursement(models.Model):
 
     def notify_applicant_church(self):
         '''notify the church that disbursement has been made'''
-        # NOTE: TO BE IMPLEMENTED
         msg = f"Greetings from the NIDF Team.\n\nWe just disbursed {self.amount} to your church. Your application ID is {self.application.application_id}. Thank you.\n\nThe NIDF Team."
         phone = self.application.church.pastor_phone
         send_sms(msg, [phone])

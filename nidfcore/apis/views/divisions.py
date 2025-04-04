@@ -41,12 +41,25 @@ class RegionsAPIView(APIView):
             return Response({"message": "You are not allowed to create regions"}, status=status.HTTP_401_UNAUTHORIZED)
 
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(created_by=user)
             if region is None:
                 return Response({"message": "Region created successfully"}, status=status.HTTP_201_CREATED)
-            return Response({"message": "Region Upudated successfully"}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Region Updated successfully"}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+    def delete(self, request, *args, **kwargs):
+        # only admin users can delete regions
+        user = request.user
+        if not (user.user_type == UserType.ADMIN.value or user.is_superuser or user.is_staff ):
+            return Response({"message": "You are not allowed to delete regions"}, status=status.HTTP_401_UNAUTHORIZED)
+        region_id = request.data.get('region')
+        region = Region.objects.filter(id=region_id).first()
+        if region is None:
+            return Response({"message": "Region not found"}, status=status.HTTP_404_NOT_FOUND)
+        region.delete()
+        return Response({"message": "Region deleted successfully"}, status=status.HTTP_200_OK)
 
 
 class DivisionsAPIView(APIView):
@@ -90,3 +103,15 @@ class DivisionsAPIView(APIView):
             return Response({"message": "Division Upudated successfully"}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self, request, *args, **kwargs):
+        # only admin users can delete divisions
+        user = request.user
+        if not (user.user_type == UserType.ADMIN.value or user.is_superuser or user.is_staff ):
+            return Response({"message": "You are not allowed to delete devision"}, status=status.HTTP_401_UNAUTHORIZED)
+        division_id = request.data.get('division')
+        division = District.objects.filter(id=division_id).first()
+        if division is None:
+            return Response({"message": "Division not found"}, status=status.HTTP_404_NOT_FOUND)
+        division.delete()
+        return Response({"message": "Division deleted successfully"}, status=status.HTTP_200_OK)
