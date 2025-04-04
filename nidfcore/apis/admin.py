@@ -30,3 +30,9 @@ class ProgressReportAdmin(admin.ModelAdmin):
     list_display = ('report_id', 'status', 'created_at',)
     list_filter = ('status',)
     search_fields = ('report_id',)
+# notifications
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('title', 'target', 'created_at',)
+    list_filter = ('target',)
+    search_fields = ('title',)
