@@ -63,11 +63,26 @@ class Application(models.Model):
         '''Returns the total amount repaid for the application'''
         return sum([rep.amount for rep in self.repayment_set.all()])
     
-    def notify_applicant(self, started=False, approved=False, rejected=False):
+    def notify_applicant(self, started=False, submitted=False, approved=False, rejected=False):
         '''Notify the applicant that the application is received|approved|rejected'''
-        msg = f"Greetings from the NIDF Team.\n\nWe just realized you started an application. Your application ID is {self.application_id}. Please note that you have to provide all the required information in order to be considered. Thank you.\n\nThe NIDF Team."
+        started_msg = f"Greetings from the NIDF Team.\n\nWe just realized you started an application. Your application ID is {self.application_id}. Please note that you have to provide all the required information in order to be considered. Thank you.\n\nThe NIDF Team."
+        submitted_msg = f"Thank you for submitting your application. Your application ID is {self.application_id}. We will get back to you as soon as possible.\n\nThe NIDF Team."
+        approved_msg = f"Congratulations from the NIDF Team.\n\nWe just approved your application for funding. Your application ID is {self.application_id}. Thank you.\n\nThe NIDF Team."
+        rejected_msg = f"Greetings from the NIDF Team.\n\nWe regret to inform you that your application with id ({self.application_id}) has been rejected.\nYou may try another application at a later date. Thank you.\n\nThe NIDF Team."
         phone = self.church.pastor_phone
-        send_sms(msg, [phone])
+        phone2 = self.church.church_phone
+        if started:
+            msg = started_msg
+        elif submitted:
+            msg = submitted_msg
+        elif approved:
+            msg = approved_msg
+        elif rejected:
+            msg = rejected_msg
+        else:
+            # message defaults to started message
+            msg = started_msg
+        send_sms(msg, [phone, phone2])
 
     def __str__(self):
         return self.application_id
@@ -150,7 +165,10 @@ class Disbursement(models.Model):
 
     def notify_applicant_church(self):
         '''notify the church that disbursement has been made'''
-        pass
+        # NOTE: TO BE IMPLEMENTED
+        msg = f"Greetings from the NIDF Team.\n\nWe just disbursed {self.amount} to your church. Your application ID is {self.application.application_id}. Thank you.\n\nThe NIDF Team."
+        phone = self.application.church.pastor_phone
+        send_sms(msg, [phone])
 
     def __str__(self):
         return f"{self.disbursement_id} - {self.amount}"

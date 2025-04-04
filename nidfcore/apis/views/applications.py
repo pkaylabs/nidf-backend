@@ -60,7 +60,9 @@ class ApplicationsAPIView(APIView):
 
         if serializer.is_valid():
             church = serializer.validated_data.get('church') or user.church_profile
-            serializer.save(created_by=user, updated_by=user, church=church)
+            application = serializer.save(created_by=user, updated_by=user, church=church)
+            # notify the church user that an application has been created
+            application.notify_applicant(started=True)
             return Response(
                 {
                     "message": "Application Created Successfully",
@@ -88,6 +90,8 @@ class ApplicationsAPIView(APIView):
             application.status = ApplicationStatus.PENDING.value
             application.updated_by = user
             application.save()
+            # notify the church that an application has been submitted
+            application.notify_applicant(submitted=True)
             return Response({"message": "Application Submitted Successfully"}, status=status.HTTP_200_OK)
         
 
@@ -139,6 +143,12 @@ class ProcessApplicationsAPIView(APIView):
                 application.status = application_status.upper()
                 application.updated_by = user
                 application.save()
+                # notify the church that an application has been processed
+                if application_status == ApplicationStatus.APPROVED.value:
+                    application.notify_applicant(approved=True)
+                elif application_status == ApplicationStatus.REJECTED.value:
+                    application.notify_applicant(rejected=True)
+
                 return Response({"message": "Application Status Changed"},  status=status.HTTP_200_OK)
             else:
                 return Response({"message": "Status is not acceptable"},  status=status.HTTP_406_NOT_ACCEPTABLE)
