@@ -110,7 +110,7 @@ class VerifyRepaymentAPIView(APIView):
         if repayment == None:
             return Response({"message": "Repayment record not found"}, status=status.HTTP_404_NOT_FOUND)
         
-        if repayment_status.upper() not in [ApplicationStatus.APPROVED.value, ApplicationStatus.VERIFIED.value, ApplicationStatus.REJECTED.value]:
+        if repayment_status.upper() not in [ApplicationStatus.APPROVED.value, ApplicationStatus.REJECTED.value]:
             return Response({"message": "Status not acceptable"}, status=status.HTTP_406_NOT_ACCEPTABLE)
         
         # change the status...
