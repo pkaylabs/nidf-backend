@@ -114,8 +114,8 @@ class VerifyRepaymentAPIView(APIView):
             return Response({"message": "Status not acceptable"}, status=status.HTTP_406_NOT_ACCEPTABLE)
         
         # change the status...
-        if repayment_status.upper() in [ApplicationStatus.APPROVED.value, ApplicationStatus.VERIFIED.value]:
-            repayment.status = ApplicationStatus.VERIFIED.value
+        if repayment_status.upper() in [ApplicationStatus.APPROVED.value]:
+            repayment.status = ApplicationStatus.APPROVED.value
             msg = "Repayment Record Verified Successfully"
         else:
             repayment.status = ApplicationStatus.REJECTED.value
