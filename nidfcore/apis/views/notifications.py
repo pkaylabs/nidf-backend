@@ -37,7 +37,7 @@ class NotificationsAPIView(APIView):
         notification_id = request.data.get('notification')
         notification = None
         if notification_id:
-            notification = Notification.objects.get(id=notification_id)
+            notification = Notification.objects.filter(id=notification_id).first()
 
         if user.user_type == UserType.CHURCH_USER.value:
             return Response({"message": "You are not allowed to create notifications"}, status=status.HTTP_401_UNAUTHORIZED)
