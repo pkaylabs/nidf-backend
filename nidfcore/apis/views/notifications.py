@@ -58,7 +58,7 @@ class NotificationsAPIView(APIView):
         if user.user_type == UserType.CHURCH_USER.value:
             return Response({"message": "You are not allowed to create notifications"}, status=status.HTTP_401_UNAUTHORIZED)
         
-        serializer = NotificationSerializer(notification, data=request.data)
+        serializer = NotificationSerializer(notification, data=request.data, partial=True)
         if serializer.is_valid():
             if notification:
                 notif = serializer.save(updated_by=user)
