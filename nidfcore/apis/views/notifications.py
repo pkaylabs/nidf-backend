@@ -34,6 +34,22 @@ class NotificationsAPIView(APIView):
     def post(self, request):
         '''Post a new notification'''
         user = request.user
+
+        if user.user_type == UserType.CHURCH_USER.value:
+            return Response({"message": "You are not allowed to create notifications"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        serializer = NotificationSerializer(data=request.data)
+        if serializer.is_valid():
+            notif = serializer.save(created_by=user)
+            # Send notification to the targeted users if the notification is not scheduled
+            if not notif.is_scheduled:
+                notif.broadcast(user=user)
+            return Response({"message": "Notification Created Successfully" ,"data":serializer.data}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        '''Update a notification'''
+        user = request.user
         notification_id = request.data.get('notification')
         notification = None
         if notification_id:
@@ -51,12 +67,9 @@ class NotificationsAPIView(APIView):
                     notif.broadcast(user=user)
                 return Response({"message": "Notification Updated Successfully" ,"data":serializer.data}, status=status.HTTP_200_OK)
             else:
-                notif = serializer.save(created_by=user)
-                # Send notification to the targeted users if the notification is not scheduled
-                if not notif.is_scheduled:
-                    notif.broadcast(user=user)
-            return Response({"message": "Notification Created Successfully" ,"data":serializer.data}, status=status.HTTP_200_OK)
+                return Response({"message": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     
     def delete(self, request):
         '''Delete a notification'''
