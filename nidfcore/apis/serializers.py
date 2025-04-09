@@ -163,11 +163,3 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = "__all__"
-
-    def validate(self, attrs):
-        # ensure that title and message are not empty
-        if not attrs.get('title'):
-            raise serializers.ValidationError("Title is required")
-        if not attrs.get('message'):
-            raise serializers.ValidationError("Message is required")
-        return attrs
