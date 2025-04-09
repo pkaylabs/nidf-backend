@@ -176,8 +176,8 @@ class Disbursement(models.Model):
 
 class Notification(models.Model):
     '''Notification model'''
-    title = models.CharField(max_length=255)
-    message = models.TextField()
+    title = models.CharField(max_length=255, null=False, blank=False)
+    message = models.TextField(null=False, blank=False)
     is_scheduled = models.BooleanField(default=False)
     schedule_start_date = models.DateTimeField(null=True, blank=True)
     schedule_start_end = models.DateTimeField(null=True, blank=True)
