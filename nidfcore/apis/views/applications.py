@@ -66,7 +66,7 @@ class ApplicationsAPIView(APIView):
             return Response(
                 {
                     "message": "Application Created Successfully",
-                    "application": serializer.data
+                    "application": ApplicationSerializers(application).data
                 }, status=status.HTTP_201_CREATED)
 
         # there was an error in the data
