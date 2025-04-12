@@ -129,7 +129,7 @@ class UsersAPIView(APIView):
         other users get only themselves
         '''
         user = request.user
-        if user.is_superuser or user.user_type == UserType.ADMIN.value:
+        if user.is_superuser or user.user_type == UserType.ADMIN.value or user.user_type == UserType.FINANCE_OFFICER.value:
             # superusers and admins get all users
             users = User.objects.all().order_by('-created_at', 'name')
         elif user.user_type == UserType.CHURCH_USER.value:

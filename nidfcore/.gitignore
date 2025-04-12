@@ -2,3 +2,4 @@ venv
 static
 assets
 db.sqlite3
+todos.txt
