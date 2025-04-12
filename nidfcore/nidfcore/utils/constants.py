@@ -31,8 +31,6 @@ class ReportStatus(Enum):
     VERIFIED = 'VERIFIED'
     REJECTED = 'REJECTED'
 
-
-
 class NotificationChannel(Enum):
     '''Defines the notification channels allowed in the system'''
     EMAIL = 'EMAIL'

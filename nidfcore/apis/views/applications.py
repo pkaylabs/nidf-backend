@@ -19,7 +19,7 @@ class ApplicationsAPIView(APIView):
 
         # superuser, admin users and finance officers can view all applications
         if user.is_superuser or user.user_type == UserType.ADMIN.value or user.user_type == UserType.FINANCE_OFFICER.value:
-            applications = Application.objects.all().order_by('-created_by')
+            applications = Application.objects.all().order_by('-created_at')
             serializer = ApplicationSerializers(applications, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user.user_type == UserType.CHURCH_USER.value:
@@ -97,6 +97,7 @@ class ApplicationsAPIView(APIView):
 
     def delete(self, request, *args, **kwargs):
         '''delete an application'''
+        # NOTE: PREVENT DELETION OF APPLICATIONS WITH DISBURSEMENTS
         user = request.user
         applicationid = request.data.get('application')
 
