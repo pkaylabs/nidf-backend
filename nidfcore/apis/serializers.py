@@ -178,3 +178,15 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = "__all__"
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    '''Serializer for resetting password'''
+    phone = serializers.CharField()
+    new_password = serializers.CharField()
+    confirm_password = serializers.CharField()
+
+    def validate(self, data):
+        if not User.objects.filter(phone=data.get('phone')).exists():
+            raise serializers.ValidationError("Phone does not exist")
+        return data

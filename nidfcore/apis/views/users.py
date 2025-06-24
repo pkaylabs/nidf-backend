@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import OTP, User
-from apis.serializers import (AddChurchSerializer, LoginSerializer, RegisterUserSerializer,
+from apis.serializers import (AddChurchSerializer, LoginSerializer, RegisterUserSerializer, ResetPasswordSerializer,
                               UserSerializer)
 from nidfcore.utils.constants import UserType
 
@@ -49,15 +49,21 @@ class LoginAPI(APIView):
 
 class VerifyOTPAPI(APIView):
     '''Verify OTP api endpoint'''
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
 
     def get(self, request, *args, **kwargs):
         '''Use this endpoint to send OTP to the user'''
-        user = request.user
-        phone = user.phone
+        phone = request.query_params.get('phone')
+        if not phone:
+            return Response({'error': 'Phone number is required'}, status=status.HTTP_400_BAD_REQUEST)
         code = random.randint(1000, 9999)
         try:
-            OTP.objects.filter(phone=phone).delete()
+            existingotp = OTP.objects.filter(phone=phone).first()
+            if existingotp:
+                existingotp.delete()
+            user = User.objects.filter(phone=phone).first()
+            if not user:
+                return Response({'error': 'User account not found'}, status=status.HTTP_404_NOT_FOUND)
             otp = OTP.objects.create(phone=phone, otp=code)
             otp.send_otp()
         except Exception as e:
@@ -65,11 +71,15 @@ class VerifyOTPAPI(APIView):
         return Response({'message': 'OTP sent successfully'}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        user = request.user
-        phone = user.phone
         otp = request.data.get('otp')
+        phone = request.data.get('phone')
+        user = User.objects.filter(phone=phone).first()
+        if not user:
+            return Response({'error': 'User account not found'}, status=status.HTTP_404_NOT_FOUND)
+        if not phone:
+            return Response({'error': 'Phone number is required'}, status=status.HTTP_400_BAD_REQUEST)
         if not otp:
-            return Response({'error': 'OTP is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Code is required'}, status=status.HTTP_400_BAD_REQUEST)
         otp = OTP.objects.filter(phone=phone, otp=otp).first()
         if not otp:
             return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
@@ -79,6 +89,40 @@ class VerifyOTPAPI(APIView):
         user.phone_verified = True
         user.save()
         return Response({'message': 'OTP verified successfully'}, status=status.HTTP_200_OK)
+
+
+# class VerifyOTPAPI(APIView):
+#     '''Verify OTP api endpoint'''
+#     permission_classes = (permissions.IsAuthenticated,)
+
+#     def get(self, request, *args, **kwargs):
+#         '''Use this endpoint to send OTP to the user'''
+#         user = request.user
+#         phone = user.phone
+#         code = random.randint(1000, 9999)
+#         try:
+#             OTP.objects.filter(phone=phone).delete()
+#             otp = OTP.objects.create(phone=phone, otp=code)
+#             otp.send_otp()
+#         except Exception as e:
+#             return Response({'error': 'Failed to send OTP'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         return Response({'message': 'OTP sent successfully'}, status=status.HTTP_200_OK)
+
+#     def post(self, request, *args, **kwargs):
+#         user = request.user
+#         phone = user.phone
+#         otp = request.data.get('otp')
+#         if not otp:
+#             return Response({'error': 'OTP is required'}, status=status.HTTP_400_BAD_REQUEST)
+#         otp = OTP.objects.filter(phone=phone, otp=otp).first()
+#         if not otp:
+#             return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
+#         if otp.is_expired():
+#             return Response({'error': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
+#         otp.delete()
+#         user.phone_verified = True
+#         user.save()
+#         return Response({'message': 'OTP verified successfully'}, status=status.HTTP_200_OK)
 
 class RegisterAPI(APIView):
     '''Register api endpoint'''
@@ -112,32 +156,6 @@ class RegisterAPI(APIView):
             "token": AuthToken.objects.create(user)[1],
         })
     
-# class RegisterAPI(APIView):
-#     '''Register api endpoint'''
-#     permission_classes = (permissions.AllowAny,)
-
-#     def post(self, request, *args, **kwargs):
-#         serializer = RegisterUserSerializer(data=request.data)
-#         try:
-#             serializer.is_valid(raise_exception=True)
-#         except Exception as e:
-#             for field in list(e.detail):
-#                 error_message = e.detail.get(field)[0]
-#                 field = f"{field}: " if field != "non_field_errors" else ""
-#                 response_data = {
-#                     "status": "error",
-#                     "error_message": f"{field} {error_message}",
-#                     "user": None,
-#                     "token": None,
-#                 }
-#                 return Response(response_data, status=status.HTTP_401_UNAUTHORIZED)
-#         else:
-#             user = serializer.save()
-#         login(request, user)
-#         return Response({
-#             "user": UserSerializer(user).data,
-#             "token": AuthToken.objects.create(user)[1],
-#         })
     
 class LogoutAPI(APIView):
     '''Logout api endpoint'''
@@ -246,4 +264,31 @@ class UserProfileAPIView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({**serializer.data, "church_logo": user.get_church_logo()}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class ResetPasswordAPIView(APIView):
+    '''API endpoint to reset user password'''
+
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = ResetPasswordSerializer
+
+    def post(self, request, *args, **kwargs):
+        '''Reset user password'''
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            phone = serializer.data.get('phone')
+            user = User.objects.filter(phone=phone).first()
+            if not user:
+                return Response({'phone': 'User not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            if not user.phone_verified:
+                return Response({'phone': 'Phone not verified.'}, status=status.HTTP_400_BAD_REQUEST)
+            if len(serializer.data.get('new_password')) < 1:
+                return Response({'new_password': 'Password is too short.'}, status=status.HTTP_400_BAD_REQUEST)
+            if not serializer.data.get('new_password') == serializer.data.get('confirm_password'):
+                return Response({'new_password': 'Passwords do not match.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user.set_password(serializer.data.get('new_password'))
+            user.save()
+            return Response({'status': 'success'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
