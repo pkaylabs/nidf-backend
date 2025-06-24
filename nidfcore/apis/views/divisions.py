@@ -11,7 +11,7 @@ from nidfcore.utils.constants import UserType
 class RegionsAPIView(APIView):
     '''Endpoint for getting and creating regions'''
 
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
 
     def get(self, request, *args, **kwargs):
         # anyone user can get all regions or a single region if a param is parsed
