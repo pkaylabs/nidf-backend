@@ -156,13 +156,13 @@ class Region(models.Model):
     location = models.TextField()
 
     # overseer details
-    overseer_name = models.CharField(max_length=255)
-    overseer_phone = models.CharField(max_length=12)
-    overseer_email = models.EmailField()
+    overseer_name = models.CharField(max_length=255, null=True, blank=True)
+    overseer_phone = models.CharField(max_length=15, null=True, blank=True)
+    overseer_email = models.EmailField(null=True, blank=True)
 
     # region details
     phone = models.CharField(max_length=12)
-    email = models.EmailField()
+    email = models.EmailField(null=True, blank=True)
 
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -198,16 +198,16 @@ class District(models.Model):
     location = models.TextField()
 
     # overseer details
-    overseer_name = models.CharField(max_length=255)
-    overseer_phone = models.CharField(max_length=12)
-    overseer_email = models.EmailField()
+    overseer_name = models.CharField(max_length=255, null=True, blank=True)
+    overseer_phone = models.CharField(max_length=12, null=True, blank=True)
+    overseer_email = models.EmailField(null=True, blank=True)
 
     # region
     region = models.ForeignKey(Region, on_delete=models.PROTECT, null=True, blank=True)
 
     # district details
     phone = models.CharField(max_length=12)
-    email = models.EmailField()
+    email = models.EmailField(null=True, blank=True)
 
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
