@@ -92,7 +92,7 @@ class Church(models.Model):
     church_phone = models.CharField(max_length=12)
     church_email = models.EmailField(null=True, blank=True)
     church_logo = models.ImageField(upload_to='churches/logos/', null=True, blank=True)
-    church_status = models.CharField(max_length=20, default=ChurchType.LOCATION.value)
+    church_status = models.CharField(max_length=60, default=ChurchType.LOCATION.value)
 
     # heirarchy
     district = models.ForeignKey('District', on_delete=models.CASCADE, null=True, blank=True)
