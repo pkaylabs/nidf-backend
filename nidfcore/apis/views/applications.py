@@ -146,6 +146,11 @@ class ProcessApplicationsAPIView(APIView):
                 application.save()
                 # notify the church that an application has been processed
                 if application_status == ApplicationStatus.APPROVED.value:
+                    try:
+                        application.set_award_reference()
+                        application.save()
+                    except Exception as e:
+                        return Response({"message": "Error setting award reference: " + str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     application.notify_applicant(approved=True)
                 elif application_status == ApplicationStatus.REJECTED.value:
                     application.notify_applicant(rejected=True)

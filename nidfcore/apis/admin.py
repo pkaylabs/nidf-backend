@@ -6,9 +6,9 @@ from .models import *
 # Application
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('application_id', 'church__name', 'amount', 'status', 'created_at',)
+    list_display = ('application_id', 'church__location_name', 'amount', 'status', 'created_at',)
     list_filter = ('status', 'church',)
-    search_fields = ('application_id', 'church__name',)
+    search_fields = ('application_id', 'church__location_name',)
 
 # Repayment
 @admin.register(Repayment)

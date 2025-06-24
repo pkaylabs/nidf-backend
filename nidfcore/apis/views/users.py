@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import OTP, User
-from apis.serializers import (LoginSerializer, RegisterUserSerializer,
+from apis.serializers import (AddChurchSerializer, LoginSerializer, RegisterUserSerializer,
                               UserSerializer)
 from nidfcore.utils.constants import UserType
 
@@ -86,8 +86,10 @@ class RegisterAPI(APIView):
 
     def post(self, request, *args, **kwargs):
         serializer = RegisterUserSerializer(data=request.data)
+        church_serializer = AddChurchSerializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
+            church_serializer.is_valid(raise_exception=True)
         except Exception as e:
             for field in list(e.detail):
                 error_message = e.detail.get(field)[0]
@@ -101,11 +103,41 @@ class RegisterAPI(APIView):
                 return Response(response_data, status=status.HTTP_401_UNAUTHORIZED)
         else:
             user = serializer.save()
+            church = church_serializer.save()
+            user.church_profile = church
+            user.save()
         login(request, user)
         return Response({
             "user": UserSerializer(user).data,
             "token": AuthToken.objects.create(user)[1],
         })
+    
+# class RegisterAPI(APIView):
+#     '''Register api endpoint'''
+#     permission_classes = (permissions.AllowAny,)
+
+#     def post(self, request, *args, **kwargs):
+#         serializer = RegisterUserSerializer(data=request.data)
+#         try:
+#             serializer.is_valid(raise_exception=True)
+#         except Exception as e:
+#             for field in list(e.detail):
+#                 error_message = e.detail.get(field)[0]
+#                 field = f"{field}: " if field != "non_field_errors" else ""
+#                 response_data = {
+#                     "status": "error",
+#                     "error_message": f"{field} {error_message}",
+#                     "user": None,
+#                     "token": None,
+#                 }
+#                 return Response(response_data, status=status.HTTP_401_UNAUTHORIZED)
+#         else:
+#             user = serializer.save()
+#         login(request, user)
+#         return Response({
+#             "user": UserSerializer(user).data,
+#             "token": AuthToken.objects.create(user)[1],
+#         })
     
 class LogoutAPI(APIView):
     '''Logout api endpoint'''

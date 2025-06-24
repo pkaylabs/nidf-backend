@@ -53,9 +53,12 @@ class Target(Enum):
 
 class ChurchType(Enum):
     '''Defines the types of churches in the system'''
-    REGIONAL = 'REGIONAL'
-    DIVISIONAL = 'DIVISIONAL'
-    LOCATION = 'LOCATION'
+ 
+    REGIONAL = 'Regional Headquarters'
+    DIVISIONAL = 'Divisional Headquarters'
+    LOCATION = 'Location Church'
+    DISTRICT = 'District Church'
+    GROUP_OF_DISTRICTS = 'Group of Districts Headquarters'
 
 
 class ConstLists:

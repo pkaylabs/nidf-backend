@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
+from django.db.models import Q
 
 from accounts.models import Church, District, Region, User
 from apis.models import Application, Disbursement, Notification, ProgressReport, Repayment
@@ -16,7 +17,21 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, data):
-        user = authenticate(**data)
+        '''login credentials can be email or phone'''
+        user = authenticate(**data) # default credential check - email and password
+        if user and user.is_active and ((hasattr(user, "deleted") and user.deleted == False) or not hasattr(user, "deleted")):
+            return user
+        if not user:
+            # Try to authenticate with phone if email fails
+            phone_or_email = data.get('email')
+            check_user = User.objects.filter(
+                Q(phone=phone_or_email) | Q(email=phone_or_email)
+            ).first()
+            if check_user:
+                phone_or_email = check_user.phone
+
+            password = data.get('password')
+            user = authenticate(phone=phone_or_email, password=password)
         if user and user.is_active and ((hasattr(user, "deleted") and user.deleted == False) or not hasattr(user, "deleted")):
             return user
         raise serializers.ValidationError("Incorrect Credentials")
@@ -30,7 +45,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         fields = ('email', 'phone', 'password', 'name', 'church_profile', 'user_type',)
         extra_kwargs = {
             'password': {'write_only': True},  # Ensure the password is not included in responses
-            'email': {'required': True},       # Email is required during registration
+            'email': {'required': False},       # Email is required during registration
             'phone': {'required': True},       # Phone is required during registration
         }
 

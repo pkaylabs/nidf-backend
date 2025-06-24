@@ -18,8 +18,23 @@ class Application(models.Model):
         '''Generates a unique application id'''
         sub = 'NIDF-AP-'
         return sub + ''.join(random.choices(string.digits, k=7))
+    
+    def generate_award_reference(app_type: str) -> str:
+        '''Generates a unique award reference'''
+        #Award reference numbers should look like NIDF-AID/RVF-YEAR-####  e.g NIDF-AID-2025-0021.
+        year = timezone.now().year
+        sub = 'NIDF-'
+        if app_type == SupportType.AID.value:
+            sub += 'AID-'
+        elif app_type == SupportType.REVOLVING_FUND.value:
+            sub += 'RVF-'
+        else:
+            sub += 'UNK-'
+        random_number = ''.join(random.choices(string.digits, k=6))
+        return f"{sub}{year}-{random_number}"
 
     application_id = models.CharField(max_length=15, default=generate_application_id, unique=True)
+    award_reference = models.CharField(max_length=50, default='', blank=True, null=True)
 
     # CHURCH DETAILS
     church = models.ForeignKey(Church, on_delete=models.CASCADE, null=True, blank=True)
@@ -68,7 +83,7 @@ class Application(models.Model):
         '''Notify the applicant that the application is received|approved|rejected'''
         started_msg = f"Greetings from the NIDF Team.\n\nWe just realized you started an application. Your application ID is {self.application_id}. Please note that you have to provide all the required information in order to be considered. Thank you.\n\nThe NIDF Team."
         submitted_msg = f"Thank you for submitting your application. Your application ID is {self.application_id}. We will get back to you as soon as possible.\n\nThe NIDF Team."
-        approved_msg = f"Congratulations from the NIDF Team.\n\nWe just approved your application for funding. Your application ID is {self.application_id}. Thank you.\n\nThe NIDF Team."
+        approved_msg = f"Congratulations from the NIDF Team.\n\nWe just approved your application for funding. Your award reference ID is {self.award_reference}. Thank you.\n\nThe NIDF Team."
         rejected_msg = f"Greetings from the NIDF Team.\n\nWe regret to inform you that your application with id ({self.application_id}) has been rejected.\nYou may try another application at a later date. Thank you.\n\nThe NIDF Team."
         phone = self.church.pastor_phone
         phone2 = self.church.church_phone
@@ -87,6 +102,12 @@ class Application(models.Model):
 
     def __str__(self):
         return self.application_id
+    
+    def set_award_reference(self):
+        '''Sets the award reference for the application'''
+        if self.status == ApplicationStatus.APPROVED.value and not self.award_reference:
+            self.award_reference = self.generate_award_reference(self.support_type)
+            self.save()
 
 
 class Repayment(models.Model):

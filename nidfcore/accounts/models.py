@@ -19,8 +19,8 @@ from .manager import AccountManager
 
 class User(AbstractBaseUser, PermissionsMixin):
     '''Custom User model for the application'''
-    email = models.EmailField(max_length=50, unique=True)
-    phone = models.CharField(max_length=12, unique=True)
+    email = models.EmailField(max_length=50, unique=True, null=True, blank=True)
+    phone = models.CharField(max_length=25, unique=True) #we sometimes pass the email as phone
     name = models.CharField(max_length=255)
     user_type = models.CharField(max_length=20, default=UserType.CHURCH_USER.value)
 
@@ -39,8 +39,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = AccountManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['phone', 'name']
+    USERNAME_FIELD = 'phone'
+    REQUIRED_FIELDS = ['name']
 
     def get_church_logo(self) -> str:
         '''Returns the church logo'''
@@ -75,22 +75,28 @@ class OTP(models.Model):
 
 class Church(models.Model):
     '''Church profile model'''
-    name = models.CharField(max_length=255)
-    address = models.TextField()
+    location_name = models.CharField(max_length=255) # location/name of the church
+    location_address = models.TextField() # physical location address of the church
 
     # administator details
     pastor_name = models.CharField(max_length=255)
     pastor_phone = models.CharField(max_length=12)
-    pastor_email = models.EmailField()
+    pastor_email = models.EmailField(null=True, blank=True)
+
+    # account managers details
+    manager_name = models.CharField(max_length=255, null=True, blank=True)
+    manager_phone = models.CharField(max_length=12, null=True, blank=True)
+    manager_email = models.EmailField(null=True, blank=True)
 
     # church details
     church_phone = models.CharField(max_length=12)
-    church_email = models.EmailField()
+    church_email = models.EmailField(null=True, blank=True)
     church_logo = models.ImageField(upload_to='churches/logos/', null=True, blank=True)
-    church_type = models.CharField(max_length=20, default=ChurchType.LOCATION.value)
+    church_status = models.CharField(max_length=20, default=ChurchType.LOCATION.value)
 
     # heirarchy
     district = models.ForeignKey('District', on_delete=models.CASCADE, null=True, blank=True)
+    region = models.ForeignKey('Region', on_delete=models.CASCADE, null=True, blank=True)
 
     # stamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -141,7 +147,7 @@ class Church(models.Model):
         return last_repayment_date + timedelta(days=30)
 
     def __str__(self):
-        return self.name
+        return self.location_name
     
 
 class Region(models.Model):

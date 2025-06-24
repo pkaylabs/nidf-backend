@@ -4,10 +4,8 @@ from django.contrib.auth.models import BaseUserManager
 class AccountManager(BaseUserManager):
     '''Manages User account creation'''
 
-    def create_user(self, email, password=None, name=None, phone=None, **kwargs):
+    def create_user(self, email=None, password=None, name=None, phone=None, **kwargs):
         '''Create a regular user'''
-        if not email:
-            raise ValueError('The Email field must be set')
         if not phone:
             raise ValueError('The Phone field must be set')
         if not password:
@@ -28,8 +26,6 @@ class AccountManager(BaseUserManager):
 
     def create_superuser(self, email, password=None, name=None, phone=None, **kwargs):
         '''Create a superuser'''
-        if not email:
-            raise ValueError('The Email field must be set')
         if not phone:
             raise ValueError('The Phone field must be set')
         if not password:
