@@ -41,6 +41,7 @@ class Application(models.Model):
     avg_service_attendance = models.IntegerField(default=0)
     avg_monthly_income = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     avg_monthly_contributions = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    monthly_repayment_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     avg_monthly_expenses = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     available_funds_for_project = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
 

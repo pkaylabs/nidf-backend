@@ -7,6 +7,30 @@ from apis.serializers import AddChurchSerializer, GetChurchSerializer
 from nidfcore.utils.constants import UserType
 
 
+class ChurchProfileAPIView(APIView):
+    '''API endpoint for church profile'''
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        '''Returns the church profile of the authenticated user'''
+        user = request.user
+        if user.church_profile:
+            serializer = GetChurchSerializer(user.church_profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'error': 'Church profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    def put(self, request, *args, **kwargs):
+        '''Updates the church profile of the authenticated user'''
+        user = request.user
+        if user.church_profile:
+            serializer = AddChurchSerializer(user.church_profile, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Church profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class ChurchesAPIView(APIView):
     '''API endpoint for churches'''
     permission_classes = [permissions.IsAuthenticated]
@@ -14,7 +38,7 @@ class ChurchesAPIView(APIView):
     def get(self, request, *args, **kwargs):
         '''Returns a list of churches'''
         # everyone can view the list of churches
-        churches = Church.objects.all().order_by('name')
+        churches = Church.objects.all().order_by('location_name')
         serializer = GetChurchSerializer(churches, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

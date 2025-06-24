@@ -49,6 +49,7 @@ urlpatterns += [
 # church and divisions endpoints
 urlpatterns += [
     path('churches/', views.ChurchesAPIView.as_view(), name='churches'),
+    path('churchprofile/', views.ChurchProfileAPIView.as_view(), name='churchprofile'),
     path('regions/', views.RegionsAPIView.as_view(), name='regions'),
     path('divisions/', views.DivisionsAPIView.as_view(), name='districts'),
 ]
