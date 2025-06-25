@@ -112,7 +112,10 @@ class VerifyOTPAPI(APIView):
         otp.delete()
         user.phone_verified = True
         user.save()
-        return Response({'message': 'OTP verified successfully'}, status=status.HTTP_200_OK)
+        return Response({
+            'message': 'OTP verified successfully',
+            'user': {**UserSerializer(user).data, "church_logo": user.get_church_logo()},
+            }, status=status.HTTP_200_OK)
 
 
 # class VerifyOTPAPI(APIView):
