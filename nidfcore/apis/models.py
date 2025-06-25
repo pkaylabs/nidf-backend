@@ -19,6 +19,7 @@ class Application(models.Model):
         sub = 'NIDF-AP-'
         return sub + ''.join(random.choices(string.digits, k=7))
     
+    @staticmethod
     def generate_award_reference(app_type: str) -> str:
         '''Generates a unique award reference'''
         #Award reference numbers should look like NIDF-AID/RVF-YEAR-####  e.g NIDF-AID-2025-0021.

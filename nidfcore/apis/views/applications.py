@@ -141,6 +141,7 @@ class ProcessApplicationsAPIView(APIView):
             
             application_statuses = [i[0] for i in ConstLists.application_statuses]
             if application_status.strip().upper() in application_statuses:
+                previous_status = application.status
                 application.status = application_status.upper()
                 application.updated_by = user
                 application.save()
@@ -150,6 +151,9 @@ class ProcessApplicationsAPIView(APIView):
                         application.set_award_reference()
                         application.save()
                     except Exception as e:
+                        # if there is an error setting the award reference, return an error response
+                        application.status = previous_status  # revert to previous status
+                        application.save()
                         return Response({"message": "Error setting award reference: " + str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     application.notify_applicant(approved=True)
                 elif application_status == ApplicationStatus.REJECTED.value:
