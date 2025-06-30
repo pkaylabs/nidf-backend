@@ -40,7 +40,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = AccountManager()
 
     USERNAME_FIELD = 'phone'
-    REQUIRED_FIELDS = ['name']
+    REQUIRED_FIELDS = ['name', 'email']
 
     def get_church_logo(self) -> str:
         '''Returns the church logo'''
